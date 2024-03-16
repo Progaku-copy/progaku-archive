@@ -13,4 +13,5 @@
 class Memo < ApplicationRecord
   validates :title, :content, presence: true
   has_many :comments, dependent: :destroy
+  has_many :tags, dependent: :destroy
 end
