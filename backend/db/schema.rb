@@ -26,6 +26,14 @@ ActiveRecord::Schema[7.0].define(version: 0) do
     t.timestamp "updated_at", null: false
   end
 
+  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "memo_id", null: false, comment: "メモID"
+    t.string "name", null: false, comment: "タグ名"
+    t.timestamp "created_at", null: false
+    t.timestamp "updated_at", null: false
+    t.index ["memo_id"], name: "index_tags_on_memo_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", null: false, comment: "ユーザーのEmailアドレス"
     t.string "password", null: false, comment: "ユーザーのpassword"
