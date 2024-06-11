@@ -9,6 +9,9 @@ on:
       - .github/workflows/deploy_openapi.yml
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   swagger-validate:
     runs-on: ubuntu-latest
