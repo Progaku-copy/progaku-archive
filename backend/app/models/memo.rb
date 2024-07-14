@@ -13,4 +13,12 @@
 class Memo < ApplicationRecord
   validates :title, :content, presence: true
   has_many :comments, dependent: :destroy
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[title content]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    ['comments']
+  end
 end

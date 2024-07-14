@@ -42,6 +42,27 @@ class MemosController < ApplicationController
     head :no_content
   end
 
+  def search
+    if params[:keyword].present?
+      q = Memo.ransack(title_or_content_cont: params[:keyword])
+      memos = q.result
+    else
+      memos = Memo.order(id: 'DESC')
+    end
+    if params[:order].present?
+      sort_direction = case params[:order]
+                       when 'asc'
+                         'ASC'
+                       when 'desc'
+                         'DESC'
+                       else
+                         'DESC'
+                       end
+      memos = Memo.order(updated_at: sort_direction)
+    end
+    render json: { memos: memos }, status: :ok
+  end
+
   private
 
   def memo_params
