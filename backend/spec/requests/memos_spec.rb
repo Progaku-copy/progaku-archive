@@ -154,4 +154,20 @@ RSpec.describe 'MemosController' do
       end
     end
   end
+
+  describe 'GET /memos/search' do
+    context 'キーワードで検索する場合' do
+      let!(:first_memo) { create(:memo, title: '1番目のメモ', content: '1番目の内容') }
+      let!(:second_memo) { create(:memo, title: '2番目のメモ', content: '2番目の内容') }
+
+      it 'キーワードに一致するメモが取得できることを確認する' do
+        aggregate_failures do
+          get '/memos/search', params: { keyword: '2番目' }
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['memos'].length).to eq(1)
+          expect(response.parsed_body['memos'][0]['title']).to eq('2番目のメモ')
+        end
+      end
+    end
+  end
 end
