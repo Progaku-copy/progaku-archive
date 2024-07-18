@@ -162,12 +162,23 @@ RSpec.describe 'MemosController' do
         create(:memo, title: '2番目のメモ', content: '2番目の内容')
       end
 
-      it 'キーワードに一致するメモが取得できることを確認する' do
+      it 'キーワードに一致するメモのタイトルが取得できることを確認する' do
         aggregate_failures do # 複数の確認を一度にまとめて行うことを意味する
           get '/memos/search', params: { keyword: '2番目' } # 「2番目」というkeywordでﾒﾓを検索するﾘｸｴｽﾄを送っている
           expect(response).to have_http_status(:ok) # ﾘｸｴｽﾄが成功しているか(ｽﾃｰﾀｽがOKか)を確認している
           expect(response.parsed_body['memos'].length).to eq(1) # 見つかったﾒﾓが1つであるか確認している
-          expect(response.parsed_body['memos'][0]['title']).to eq('2番目のメモ') # 見つかったﾒﾓのﾀｲﾄﾙが「2番目のﾒﾓ」であることを確認している
+          # 見つかったﾒﾓのﾀｲﾄﾙが「2番目のﾒﾓ」であることを確認 [0]は最初に作成したmemosのことで、そのmemosのtitleということ
+          expect(response.parsed_body['memos'][0]['title']).to eq('2番目のメモ')
+        end
+      end
+
+      it 'キーワードに一致するメモのコンテントが取得できることを確認する' do
+        aggregate_failures do # 複数の確認を一度にまとめて行うことを意味する
+          get '/memos/search', params: { keyword: '1番目の内' } # 「1番目の内」というkeywordでﾒﾓを検索するﾘｸｴｽﾄを送っている
+          expect(response).to have_http_status(:ok) # ﾘｸｴｽﾄが成功しているか(ｽﾃｰﾀｽがOKか)を確認している
+          expect(response.parsed_body['memos'].length).to eq(1) # 見つかったﾒﾓが1つであるか確認している
+          # 見つかったﾒﾓのﾀｲﾄﾙが「2番目のﾒﾓ」であることを確認 [0]は最初に作成したmemosのことで、そのmemosのcontentということ
+          expect(response.parsed_body['memos'][0]['content']).to eq('1番目の内容')
         end
       end
 
