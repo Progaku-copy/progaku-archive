@@ -43,28 +43,34 @@ class MemosController < ApplicationController
   end
 
   def search
-    if params[:keyword].present? # keywordが存在している時
-      q = Memo.ransack(title_or_content_cont: params[:keyword]) # keywordを含む情報をtitleまたはcontentから取得
-      memos = q.result # その検索結果をmemosに代入
-    else # もし「keyword」が入力されていなかったら
-      memos = Memo.order(id: 'DESC') # 全てのメモを新しい順(降順)で並べてmemosに入れます
-    end
-    if params[:order].present? # order（並び替えのルール）が存在している時
-      sort_direction = case params[:order] # 以下のケースをsort_directionに代入
-                       when 'asc' # params[asc]の場合
-                         'ASC' # 昇順 DBと対話するため大文字にしている
-                       when 'desc' # params[desc]の場合
-                         'DESC' # 降順 DBと対話するため大文字にしている
-                       else # paramsに何も入っていない時
-                         'DESC' # 降順 DBと対話するため大文字にしている
-                       end
-      memos = Memo.order(updated_at: sort_direction) # メモが最後に更新された時間で上記の順番で並び替える
-    end
-    render json: { memos: memos }, status: :ok # 最後に見つかったメモをJSONという形で表示します。status: :ok は「ちゃんと動きましたよ」という意味
-
+    result_memos = fetch_memos # 検索結果をresult_memosに代入
+    # order（並び替えのルール）が存在している時,下記の並び順を検索結果を引数とした並び変え実施しsorted_memosに代入
+    sorted_memos = sort_memos(result_memos) if params[:order].present?
+    # 最後に見つかったメモをJSONという形で表示します。status: :ok は「ちゃんと動きましたよ」という意味
+    # 並べ替えが行われている場合はsorted_memos、そうでない場合はresult_memosをJSONレスポンスとして返します。
+    render json: { memos: sorted_memos || result_memos }, status: :ok
   end
 
   private
+
+  def fetch_memos
+    if params[:keyword].present? # keywordが存在している時
+      q = Memo.ransack(title_or_content_cont: params[:keyword]) # keywordを含む情報をtitleまたはcontentから取得
+      q.result # その検索結果を取得
+    else # もし「keyword」が入力されていなかったら
+      Memo.order(id: 'DESC') # 全てのメモを新しい順(降順)で並べて取得
+    end
+  end
+
+  def sort_memos(memos)
+    sort_direction = 'DESC' # ﾃﾞﾌｫﾙﾄの並び替え方向を降順に設定
+    sort_direction = 'ASC' if params[:order] == 'asc' # params[asc]の場合に昇順(DBと対話するため大文字）
+    sort_direction = 'DESC' if params[:order] == 'desc' # params[desc]の場合に降順(DBと対話するため大文字）
+    # Memosは存在しないｸﾗｽ名のためMemos.orderとするとｴﾗｰになってしまう
+    # MemoはﾓﾃﾞﾙｸﾗｽのためMemo.orderとするとMemoﾓﾃﾞﾙ全体に対して並び替えしてしまう
+    # searchﾒｿｯﾄﾞのsort_memos(result_memos)からmemosはfetch_memosﾒｿｯﾄﾞが返すﾒﾓのﾘｽﾄとなりmemos.orderが適切
+    memos.order(updated_at: sort_direction) # メモが最後に更新された時間で上記の順番で並び替える
+  end
 
   def memo_params
     params.require(:memo).permit(:title, :content)
