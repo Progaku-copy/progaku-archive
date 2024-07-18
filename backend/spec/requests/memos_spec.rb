@@ -157,8 +157,8 @@ RSpec.describe 'MemosController' do
 
   describe 'GET /memos/search' do
     context 'キーワードで検索する場合' do
-      before do
-        create(:memo, title: '1番目のメモ', content: '1番目の内容') # !付きはﾌﾞﾛｯｸ実行前にcreateする
+      before do # beforeはﾃｽﾄが実行される前に実行するｺｰﾄﾞ またlet!よりｾｯﾄｱｯﾌﾟｺｰﾄﾞを一か所にまとめるため可読性向上する
+        create(:memo, title: '1番目のメモ', content: '1番目の内容') # let!付きはﾌﾞﾛｯｸ実行前にcreateする
         create(:memo, title: '2番目のメモ', content: '2番目の内容')
       end
 
