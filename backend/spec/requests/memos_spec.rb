@@ -157,15 +157,32 @@ RSpec.describe 'MemosController' do
 
   describe 'GET /memos/search' do
     context 'キーワードで検索する場合' do
-      let!(:first_memo) { create(:memo, title: '1番目のメモ', content: '1番目の内容') }
-      let!(:second_memo) { create(:memo, title: '2番目のメモ', content: '2番目の内容') }
+      before do
+        create(:memo, title: '1番目のメモ', content: '1番目の内容') # !付きはﾌﾞﾛｯｸ実行前にcreateする
+        create(:memo, title: '2番目のメモ', content: '2番目の内容')
+      end
 
       it 'キーワードに一致するメモが取得できることを確認する' do
-        aggregate_failures do
-          get '/memos/search', params: { keyword: '2番目' }
-          expect(response).to have_http_status(:ok)
-          expect(response.parsed_body['memos'].length).to eq(1)
-          expect(response.parsed_body['memos'][0]['title']).to eq('2番目のメモ')
+        aggregate_failures do # 複数の確認を一度にまとめて行うことを意味する
+          get '/memos/search', params: { keyword: '2番目' } # 「2番目」というkeywordでﾒﾓを検索するﾘｸｴｽﾄを送っている
+          expect(response).to have_http_status(:ok) # ﾘｸｴｽﾄが成功しているか(ｽﾃｰﾀｽがOKか)を確認している
+          expect(response.parsed_body['memos'].length).to eq(1) # 見つかったﾒﾓが1つであるか確認している
+          expect(response.parsed_body['memos'][0]['title']).to eq('2番目のメモ') # 見つかったﾒﾓのﾀｲﾄﾙが「2番目のﾒﾓ」であることを確認している
+        end
+      end
+
+      it 'キーワードを空で検索すると全てのメモが取得できることを確認する' do
+        aggregate_failures do # 複数の確認を一度にまとめて行うことを意味する
+          get '/memos/search', params: { keyword: '' } # 空のkeywordでﾒﾓを検索するﾘｸｴｽﾄを送っている
+          expect(response).to have_http_status(:ok) # ﾘｸｴｽﾄが成功しているか(ｽﾃｰﾀｽがOKか)を確認している
+          expect(response.parsed_body['memos'].length).to eq(2) # 見つかったﾒﾓが2つであるか確認している
+          # 見つかったﾒﾓのﾀｲﾄﾙが「1番目のﾒﾓと2番目のﾒﾓ」であることを確認している
+          # map:配列作成のための命令 |memo|:要素名 memo['title']:それぞれのﾒﾓのﾀｲﾄﾙを取る to:～であることを期待する
+          # contain_exactly:この配列の中にあるものが、指定したものと同じであるかを確認
+          # しかしmapは全てのﾒﾓｵﾌﾞｼﾞｪｸﾄを読み込みその後ﾀｲﾄﾙだけを取り出すので不要なﾒﾓﾘ使用が発生する
+          # そのためpluckを使用しDBから直接ﾀｲﾄﾙだけ取得するので余計なﾒﾓﾘ使用を避けることができる
+          # expect(response.parsed_body['memos'].map { |memo| memo['title'] }).to contain_exactly('1番目のメモ', '2番目のメモ')
+          expect(Memo.pluck(:title)).to contain_exactly('1番目のメモ', '2番目のメモ')
         end
       end
     end
