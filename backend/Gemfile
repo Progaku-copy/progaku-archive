@@ -62,6 +62,8 @@ group :development, :test do
   gem "rubocop-rails", require: false
   # Github: https://github.com/rubocop/rubocop-rspec
   gem "rubocop-rspec", require: false
+
+  gem "ransack" # 検索機能を実装するためのgem
 end
 
 group :development do

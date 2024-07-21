@@ -42,6 +42,29 @@ class MemosController < ApplicationController
     head :no_content
   end
 
+  def search
+    memos = if params[:keyword].present?
+              q = Memo.ransack(title_or_content_cont: params[:keyword])
+              q.result
+            else
+              Memo.all
+            end
+
+    # if params[:order].present?
+    #   order = case params[:order]
+    #           when 'asc'
+    #             'ASC'
+    #           when 'desc'
+    #             'DESC'
+    #           else
+    #             'DESC'
+    #           end
+    #   memos = Memo.order(updated_at: order)
+    # end
+
+    render json: { memos: memos }, status: :ok
+  end
+
   private
 
   def memo_params
@@ -51,4 +74,6 @@ class MemosController < ApplicationController
   def update_memo_params
     params.require(:memo).permit(:content)
   end
+
+
 end
