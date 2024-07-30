@@ -154,4 +154,53 @@ RSpec.describe 'MemosController' do
       end
     end
   end
+
+  describe 'SearchResolver' do
+    let!(:memo1) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
+    let!(:memo2) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
+    let!(:memo3) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
+  
+    describe 'resolveメソッドのテスト' do
+      context 'タイトルで検索した場合' do
+        it 'タイトルフィルターが正しく機能することを確認する' do
+          filter_params = { title: 'テスト' }
+          result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+          expect(result).to contain_exactly(memo1, memo3)
+        end
+      end
+
+      context 'コンテンツで検索した場合' do
+        it 'コンテンツフィルターが正しく機能することを確認する' do
+          filter_params = { content: 'コンテンツ' }
+          result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+          expect(result).to contain_exactly(memo1, memo2, memo3)
+        end
+      end
+
+      context '並び替え機能のテスト' do
+        it '並び替え機能が正しく機能することを確認する' do
+          filter_params = { order: 'desc' }
+          result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+          expect(result).to eq([memo3, memo2, memo1])
+        end
+      end
+
+      context 'タイトルとコンテンツで検索した場合' do
+        it 'タイトルとコンテンツフィルターが正しく機能することを確認する' do
+          filter_params = { title: 'テスト', content: 'コンテンツ', order: 'desc' }
+          result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+          expect(result).to eq([memo3, memo1])
+        end
+      end
+
+      context '検索内容を入力しない場合' do
+        it '全てのメモが返されることを確認する' do
+          filter_params = {}
+          result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+          expect(result).to contain_exactly(memo1, memo2, memo3)
+        end
+      end
+    end
+  end
 end
+
