@@ -33,4 +33,31 @@ RSpec.describe 'CommentsController' do
       end
     end
   end
+
+  describe 'DELETE /memos/:memo_id/comments/:id' do
+    context 'コメントが存在する場合' do
+      let!(:memo) { create(:memo) }
+      let!(:comment) { create(:comment, memo: memo) }
+
+      it 'コメントが削除され、204になる' do
+        aggregate_failures do
+          expect do
+            delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
+          end.to change(Comment, :count).by(-1)
+          expect(response).to have_http_status(:no_content)
+        end
+      end
+    end
+
+    context 'コメントが存在しない場合' do
+      it '404が返ることを確認する' do
+        aggregate_failures do
+          expect do
+            delete '/memos/0/comments/0', as: :json
+          end.not_to change(Comment, :count)
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
 end
