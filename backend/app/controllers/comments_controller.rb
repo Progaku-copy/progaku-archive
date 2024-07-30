@@ -12,6 +12,13 @@ class CommentsController < ApplicationController
     end
   end
 
+  def destroy
+    memo = Memo.find(params[:memo_id])
+    comment = memo.comments.find(params[:id])
+    comment.destroy
+    head :no_content
+  end
+
   private
 
   def comment_params
