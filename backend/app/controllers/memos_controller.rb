@@ -3,8 +3,9 @@
 class MemosController < ApplicationController
   # GET /memos
   def index
-    memos = Memo.order(id: 'DESC')
-    render json: { memos: memos }, status: :ok
+    memos = Memo.all
+    @memos = Memo::SearchResolver.resolve(filter_collection: memos, filter_params: params)
+    render json: { memos: @memos }, status: :ok
   end
 
   # GET /memos/:id
