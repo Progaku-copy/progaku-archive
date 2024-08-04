@@ -17,7 +17,7 @@ class Memo < ApplicationRecord
   module SearchResolver
     FILTERS = %i[TitleFilter ContentFilter OrderFilter].freeze
     private_constant :FILTERS
-  
+
     # @param filter_collection [ActiveRecord::Relation[Memo]]
     # @param filter_params [ActionController::Parameters]
     # @return [ActiveRecord::Relation[Memo]]
@@ -27,7 +27,7 @@ class Memo < ApplicationRecord
         const_get(filter).resolve(scope: memo_scope, params: filter_params)
       end
     end
-    
+
     private
 
     def resolve
@@ -36,7 +36,7 @@ class Memo < ApplicationRecord
         const_get(filter).resolve(scope: memo_scope, params: filter_params)
       end
     end
-  
+
     module TitleFilter
       def self.resolve(scope:, params:)
         return scope if params[:title].blank?
@@ -45,7 +45,7 @@ class Memo < ApplicationRecord
       end
     end
     private_constant :TitleFilter
-  
+
     module ContentFilter
       def self.resolve(scope:, params:)
         return scope if params[:content].blank?
@@ -54,7 +54,7 @@ class Memo < ApplicationRecord
       end
     end
     private_constant :ContentFilter
-      
+
     module OrderFilter
       def self.resolve(scope:, params:)
         return scope if params[:order].blank?
