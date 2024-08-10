@@ -35,17 +35,5 @@ create_table "memo_tags", charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', f
   t.index ["tag_id"], name: "index_memo_tags_on_tag_id"
 end
 
-create_table "admin_users", force: :cascade do |t|
-  t.string   "email",                  default: "", null: false
-  t.string   "encrypted_password",     default: "", null: false
-  t.string   "reset_password_token"
-  t.datetime "reset_password_sent_at"
-  t.datetime "remember_created_at"
-  t.datetime "created_at",                          null: false
-  t.datetime "updated_at",                          null: false
-  t.index ["email"], name: "index_admin_users_on_email", unique: true
-  t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
-end
-
 add_foreign_key "memo_tags", "memos", column: 'memo_id', name: 'fk_memo_tags_memo_id'
 add_foreign_key "memo_tags", "tags", column: 'tag_id', name: 'fk_memo_tags_tag_id'
