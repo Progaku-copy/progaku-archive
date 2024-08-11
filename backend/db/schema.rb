@@ -62,4 +62,5 @@ ActiveRecord::Schema[7.0].define(version: 0) do
 
   add_foreign_key "memo_tags", "memos", name: "fk_memo_tags_memo_id"
   add_foreign_key "memo_tags", "tags", name: "fk_memo_tags_tag_id"
+  add_foreign_key "comments", "memos", name: "fk_comments_memo_id"
 end

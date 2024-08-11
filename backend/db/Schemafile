@@ -37,3 +37,4 @@ end
 
 add_foreign_key "memo_tags", "memos", column: 'memo_id', name: 'fk_memo_tags_memo_id'
 add_foreign_key "memo_tags", "tags", column: 'tag_id', name: 'fk_memo_tags_tag_id'
+add_foreign_key 'comments', 'memos', column: 'memo_id', name: 'fk_comments_memo_id'
