@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MemosController < ApplicationController
+  before_action :set_memo, only: %i[show update destroy]
+
   # GET /memos
   def index
     memos = Memo.order(id: 'DESC')
@@ -9,46 +11,49 @@ class MemosController < ApplicationController
 
   # GET /memos/:id
   def show
-    @memo = Memo.find(params[:id])
     @comments = @memo.comments.order(id: 'DESC')
     render 'show', status: :ok
   end
 
   # POST /memos
   def create
-    memo = Memo.new(memo_params)
-    if memo.save
+    @memo_form = MemoForm.new(memo_form_params)
+
+    if @memo_form.save
       head :no_content
     else
-      render json: { errors: memo.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @memo_form.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   # PUT /memos/:id
   def update
-    memo = Memo.find(params[:id])
-
-    if memo.update(update_memo_params)
+    @memo_form = MemoForm.new(update_memo_form_params, memo: @memo)
+    
+    if @memo_form.save
       head :no_content
     else
-      render json: { errors: memo.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @memo_form.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   # DELETE /memos/:id
   def destroy
-    memo = Memo.find(params[:id])
-    memo.destroy
+    @memo.destroy
     head :no_content
   end
 
   private
 
-  def memo_params
-    params.require(:memo).permit(:title, :content)
+  def set_memo
+    @memo = Memo.find(params[:id])
   end
 
-  def update_memo_params
-    params.require(:memo).permit(:content)
+  def memo_form_params
+    params.require(:memo_form).permit(:title, :content, tag_ids: [])
+  end
+
+  def update_memo_form_params
+    params.require(:memo_form).permit(:content, tag_ids: [])
   end
 end
