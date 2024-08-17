@@ -29,7 +29,7 @@ class MemosController < ApplicationController
   # PUT /memos/:id
   def update
     @memo_form = MemoForm.new(update_memo_form_params, memo: @memo)
-    
+
     if @memo_form.save
       head :no_content
     else

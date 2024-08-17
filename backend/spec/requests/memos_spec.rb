@@ -53,12 +53,15 @@ RSpec.describe 'MemosController' do
 
     context 'タイトルとコンテンツが有効な場合' do
       let(:valid_memo_form_params) do
-        { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5), tag_ids: tag_ids }
+        { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5),
+          tag_ids: tag_ids }
       end
 
       it 'memoレコードが追加され、タグが紐付けられ、204になる' do
         aggregate_failures do
-          expect { post '/memos', params: { memo_form: valid_memo_form_params }, as: :json }.to change(Memo, :count).by(+1)
+          expect do
+            post '/memos', params: { memo_form: valid_memo_form_params }, as: :json
+          end.to change(Memo, :count).by(+1)
           expect(Memo.last.tags.count).to eq(3)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
@@ -75,9 +78,11 @@ RSpec.describe 'MemosController' do
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          expect { 
-            expect { post '/memos', params: { memo_form: invalid_memo_form_params }, as: :json }.not_to change(Memo, :count)
-          }.not_to change(Tag, :count)
+          expect do
+            expect do
+              post '/memos', params: { memo_form: invalid_memo_form_params }, as: :json
+            end.not_to change(Memo, :count)
+          end.not_to change(Tag, :count)
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_entity)
           assert_response_schema_confirm(422)
@@ -90,10 +95,11 @@ RSpec.describe 'MemosController' do
   describe 'PUT /memos/:id' do
     let!(:existing_memo) { create(:memo) }
     let!(:existing_tags) { create_list(:tag, 3) }
-    let!(:existing_memo_tag) { create(:memo_tag, memo: existing_memo, tag: existing_tags.first) }
+
+    before { create(:memo_tag, memo: existing_memo, tag: existing_tags.first) }
 
     context 'コンテンツ、タグが有効な場合' do
-      let(:params) { { content: '新しいコンテンツ', tag_ids: [ existing_tags.second.id ] } }
+      let(:params) { { content: '新しいコンテンツ', tag_ids: [existing_tags.second.id] } }
 
       it 'memoが更新され、204になる' do
         aggregate_failures do
@@ -109,7 +115,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'バリデーションエラーになる場合' do
-      let(:params) { { content: '', tag_ids: [ existing_tags.last.id + 100 ] } }
+      let(:params) { { content: '', tag_ids: [existing_tags.last.id + 100] } }
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
@@ -125,7 +131,7 @@ RSpec.describe 'MemosController' do
 
     context 'タイトルを更新しようとした場合' do
       let(:params) { { title: '新しいタイトル' } }
-  
+
       it 'タイトルが変更されていないことを確認する' do
         aggregate_failures do
           put "/memos/#{existing_memo.id}", params: { memo_form: params }, as: :json

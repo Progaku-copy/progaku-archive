@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MemoForm
   include ActiveModel::Model
 
@@ -6,11 +8,10 @@ class MemoForm
   validates :title, presence: true
   validates :content, presence: true
   validate :tag_ids_must_exist
-  
 
   def initialize(attributes = nil, memo: Memo.new)
     @memo = memo
-    attributes = default_attributes.merge(attributes) 
+    attributes = default_attributes.merge(attributes)
     super(attributes)
   end
 
@@ -40,9 +41,9 @@ class MemoForm
 
   def tag_ids_must_exist
     return if tag_ids.blank?
-  
-    if Tag.where(id: tag_ids).count != tag_ids.size
-      errors.add(:tag_ids, "に無効なものが含まれています")
-    end
+
+    return unless Tag.where(id: tag_ids).count != tag_ids.size
+
+    errors.add(:tag_ids, 'に無効なものが含まれています')
   end
 end
