@@ -48,14 +48,18 @@ RSpec.describe 'MemosController' do
   end
 
   describe 'POST /memos' do
+    let!(:tags) { create_list(:tag, 3) }
+    let(:tag_ids) { tags.map(&:id) }
+
     context 'タイトルとコンテンツが有効な場合' do
-      let(:valid_memo_params) do
-        { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5) }
+      let(:valid_memo_form_params) do
+        { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5), tag_ids: tag_ids }
       end
 
-      it 'memoレコードが追加され、204になる' do
+      it 'memoレコードが追加され、タグが紐付けられ、204になる' do
         aggregate_failures do
-          expect { post '/memos', params: { memo: valid_memo_params }, as: :json }.to change(Memo, :count).by(+1)
+          expect { post '/memos', params: { memo_form: valid_memo_form_params }, as: :json }.to change(Memo, :count).by(+1)
+          expect(Memo.last.tags.count).to eq(3)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -65,11 +69,15 @@ RSpec.describe 'MemosController' do
     end
 
     context 'バリデーションエラーになる場合' do
-      let(:empty_memo_params) { { title: '', content: '' } }
+      let(:invalid_memo_form_params) do
+        { title: '', content: '', tag_ids: tag_ids }
+      end
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          post '/memos', params: { memo: empty_memo_params }, as: :json
+          expect { 
+            expect { post '/memos', params: { memo_form: invalid_memo_form_params }, as: :json }.not_to change(Memo, :count)
+          }.not_to change(Tag, :count)
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_entity)
           assert_response_schema_confirm(422)
@@ -80,51 +88,53 @@ RSpec.describe 'MemosController' do
   end
 
   describe 'PUT /memos/:id' do
-    context 'コンテンツが有効な場合' do
-      let(:existing_memo) { create(:memo) }
-      let(:params) { { content: '新しいコンテンツ' } }
+    let!(:existing_memo) { create(:memo) }
+    let!(:existing_tags) { create_list(:tag, 3) }
+    let!(:existing_memo_tag) { create(:memo_tag, memo: existing_memo, tag: existing_tags.first) }
+
+    context 'コンテンツ、タグが有効な場合' do
+      let(:params) { { content: '新しいコンテンツ', tag_ids: [ existing_tags.second.id ] } }
 
       it 'memoが更新され、204になる' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { memo_form: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
           existing_memo.reload
           expect(existing_memo.content).to eq('新しいコンテンツ')
+          expect(existing_memo.tags.first.name).to eq(existing_tags.second.name)
         end
       end
     end
 
     context 'バリデーションエラーになる場合' do
-      let(:existing_memo) { create(:memo) }
-      let(:params) { { content: '' } }
+      let(:params) { { content: '', tag_ids: [ existing_tags.last.id + 100 ] } }
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { memo_form: params }, as: :json
           assert_request_schema_confirm
           existing_memo.reload
           expect(response).to have_http_status(:unprocessable_entity)
           assert_response_schema_confirm(422)
-          expect(response.parsed_body['errors']).to eq(['コンテンツを入力してください'])
+          expect(response.parsed_body['errors']).to eq(%w[コンテンツを入力してください タグに無効なものが含まれています])
         end
       end
     end
-  end
 
-  context 'タイトルを更新しようとした場合' do
-    let(:existing_memo) { create(:memo) }
-    let(:params) { { title: '新しいタイトル' } }
-
-    it 'タイトルが変更されていないことを確認する' do
-      aggregate_failures do
-        put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
-        assert_request_schema_confirm
-        expect(response).to have_http_status(:no_content)
-        existing_memo.reload
-        assert_response_schema_confirm(204)
-        expect(existing_memo.title).not_to eq('新しいタイトル')
+    context 'タイトルを更新しようとした場合' do
+      let(:params) { { title: '新しいタイトル' } }
+  
+      it 'タイトルが変更されていないことを確認する' do
+        aggregate_failures do
+          put "/memos/#{existing_memo.id}", params: { memo_form: params }, as: :json
+          assert_request_schema_confirm
+          expect(response).to have_http_status(:no_content)
+          existing_memo.reload
+          assert_response_schema_confirm(204)
+          expect(existing_memo.title).not_to eq('新しいタイトル')
+        end
       end
     end
   end
