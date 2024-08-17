@@ -1,0 +1,7 @@
+ja:
+  activemodel:
+    attributes:
+      memo_form:
+        title: タイトル
+        content: コンテンツ
+        tag_ids: タグ
