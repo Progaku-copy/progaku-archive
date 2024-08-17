@@ -100,7 +100,7 @@ RSpec.describe 'Tags' do
     end
 
     context 'レコードが存在しない場合' do
-      let(:tag_id) { 100 }
+      let(:tag_id) { 0 }
 
       before { put tag_path(tag_id), params: { tag: { name: 'Update Tag' } } }
 
