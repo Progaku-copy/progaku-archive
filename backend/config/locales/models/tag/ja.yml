@@ -3,3 +3,4 @@ ja:
     attributes:
       tag:
         name: タグ名
+        priority: タグの順番

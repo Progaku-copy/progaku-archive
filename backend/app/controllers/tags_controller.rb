@@ -1,51 +1,46 @@
 # frozen_string_literal: true
 
 class TagsController < ApplicationController
-  before_action :set_tag, only: [:show, :update, :destroy]
-
   # GET /tags
   def index
-    @tags = Tag.all
-    render json: @tags, status: :ok
-  end
-
-  # GET /tags/:id
-  def show
-    render json: @tag, status: :ok
+    tags = Tag.all
+    render json: tags.order(priority: :asc), only: [:id, :name, :priority], status: :ok
   end
 
   # POST /tags
   def create
-    @tag = Tag.new(tag_params)
-    if @tag.save
-      render json: @tag, status: :created
+    tag = Tag.new(tag_params)
+    if tag.save
+      head :created
     else
-      render json: { errors: @tag.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: tag.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   # PUT /tags/:id
   def update
-    if @tag.update(tag_params)
-      render json: @tag
+    tag = Tag.find(params[:id])
+
+    if tag.update(tag_params)
+      head :no_content
     else
-      render json: { errors: @tag.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: tag.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   # DELETE /tags/:id
   def destroy
-    @tag.destroy
-    head :no_content
+    tag = Tag.find(params[:id])
+    if tag.destroy
+      head :no_content
+    else
+      render json: { errors: tag.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
 
-  def set_tag
-    @tag = Tag.find(params[:id])
-  end
-
   def tag_params
-    params.require(:tag).permit(:name)
+    params.require(:tag).permit(:name, :priority)
   end
 end
