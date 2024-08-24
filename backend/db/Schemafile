@@ -13,7 +13,7 @@ create_table 'memos', charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', force
 end
 
 create_table 'comments', charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', force: :cascade do |t|
-  t.integer "memo_id", null: false, comment: 'メモID'
+  t.bigint "memo_id", null: false, comment: 'メモID'
   t.string "content", limit: 1024, null: false, comment: '内容'
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
@@ -21,9 +21,11 @@ create_table 'comments', charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', fo
 end
 
 create_table "tags", charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', force: :cascade do |t|
-  t.string "name", null: false
+  t.string "name", null: false, comment: 'タグ名'
+  t.integer "priority", null: false, comment: 'タグの順番'
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
+  t.index ["priority"], name: "index_tags_on_priority"
 end
 
 create_table "memo_tags", charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', force: :cascade do |t|
