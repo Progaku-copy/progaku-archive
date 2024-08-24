@@ -4,7 +4,7 @@ class TagsController < ApplicationController
   # GET /tags
   def index
     tags = Tag.all
-    render json: tags, status: :ok
+    render json: tags, only: [:id, :name], status: :ok
   end
 
   # POST /tags

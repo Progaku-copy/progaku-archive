@@ -11,10 +11,17 @@ RSpec.describe 'Tags' do
   describe 'GET /tags' do
     before { get tags_path }
 
-    it 'タグ一覧を返す' do
+    it 'タグ一覧でタグIDを返す' do
       tag_ids = tags.map(&:id)
       json.each do |tag|
         expect(tag_ids).to include(tag['id'])
+      end
+    end
+
+    it 'タグ一覧でタグ名を返す' do
+      tag_names = tags.map(&:name)
+      json.each do |tag|
+        expect(tag_names).to include(tag['name'])
       end
     end
 
