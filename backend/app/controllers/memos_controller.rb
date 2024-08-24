@@ -16,7 +16,7 @@ class MemosController < ApplicationController
 
   # POST /memos
   def create
-    @memo_form = MemoForm.new(memo_form_params)
+    @memo_form = MemoForm.new(create_params)
 
     if @memo_form.save
       head :no_content
@@ -28,7 +28,7 @@ class MemosController < ApplicationController
   # PUT /memos/:id
   def update
     memo = Memo.find(params[:id])
-    @memo_form = MemoForm.new(update_memo_form_params, memo: memo)
+    @memo_form = MemoForm.new(update_params, memo: memo)
 
     if @memo_form.save
       head :no_content
@@ -46,11 +46,11 @@ class MemosController < ApplicationController
 
   private
 
-  def memo_form_params
+  def create_params
     params.require(:memo_form).permit(:title, :content, tag_ids: [])
   end
 
-  def update_memo_form_params
+  def update_params
     params.require(:memo_form).permit(:content, tag_ids: [])
   end
 end
