@@ -4,7 +4,7 @@ class TagsController < ApplicationController
   # GET /tags
   def index
     tags = Tag.all
-    render json: tags, only: [:id, :name], status: :ok
+    render json: tags.order(priority: :asc), only: [:id, :name, :priority], status: :ok
   end
 
   # POST /tags
@@ -38,6 +38,6 @@ class TagsController < ApplicationController
   private
 
   def tag_params
-    params.require(:tag).permit(:name)
+    params.require(:tag).permit(:name, :priority)
   end
 end

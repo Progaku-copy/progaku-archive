@@ -18,5 +18,6 @@
 FactoryBot.define do
   factory :tag do
     name { Faker::Lorem.sentence(word_count: 1) }
+    sequence(:priority) { |n| n }
   end
 end

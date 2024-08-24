@@ -19,4 +19,5 @@ class Tag < ApplicationRecord
   has_many :memos, through: :memo_tags
 
   validates :name, presence: true
+  validates :priority, presence: true
 end

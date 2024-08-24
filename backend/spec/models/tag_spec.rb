@@ -37,6 +37,19 @@ RSpec.describe Tag do
         expect(tag.errors.full_messages).to eq ['タグ名を入力してください']
       end
     end
+
+    context 'タグの順番がない場合' do
+      let(:tag) { build(:tag, priority: nil) }
+
+      it '無効な状態であること' do
+        expect(tag).not_to be_valid
+      end
+
+      it 'エラーメッセージが「タグの順番を入力してください」となっていること' do
+        tag.valid?
+        expect(tag.errors.full_messages).to eq ['タグの順番を入力してください']
+      end
+    end
   end
 
   describe 'アソシエーションのテスト' do

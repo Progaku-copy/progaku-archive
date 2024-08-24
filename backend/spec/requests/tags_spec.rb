@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Tags' do
-  let!(:tags) { create_list(:tag, 3) }
-  let(:tag_id) { tags.first.id }
+  let!(:tag1) { create(:tag, priority: 2) }
+  let!(:tag2) { create(:tag, priority: 1) }
+  let!(:tag3) { create(:tag, priority: 3) }
+  let(:tags) { [tag1, tag2, tag3] }
+  let(:tag_id) { tag1.id }
 
   def json
     response.parsed_body
@@ -25,6 +28,11 @@ RSpec.describe 'Tags' do
       end
     end
 
+    it 'タグ一覧でタグを昇順で返す' do
+      tag_priorities = tags.map(&:priority)
+      expect(json.map { |tag| tag['priority'] }).to eq(tag_priorities.sort)
+    end
+
     it 'タグ数が正しい' do
       expect(json.size).to eq(3)
     end
@@ -38,12 +46,12 @@ RSpec.describe 'Tags' do
     context 'リクエストが有効な場合' do
       it 'タグが作成される' do
         expect do
-          post tags_path, params: { tag: { name: 'New Tag' } }
+          post tags_path, params: { tag: { name: 'New Tag', priority: 1 } }
         end.to change(Tag, :count).by(1)
       end
 
       it 'ステータスコード201を返す' do
-        post tags_path, params: { tag: { name: 'New Tag' } }
+        post tags_path, params: { tag: { name: 'New Tag', priority: 1 } }
         expect(response).to have_http_status(:created)
       end
     end
@@ -83,7 +91,7 @@ RSpec.describe 'Tags' do
     context 'レコードが存在しない場合' do
       let(:tag_id) { 100 }
 
-      before { put tag_path(tag_id), params: { tag: { name: 'Update Tag' } } }
+      before { put tag_path(tag_id), params: { tag: { name: 'Update Tag'   } } }
 
       it 'ステータスコード404を返す' do
         expect(response).to have_http_status(:not_found)
