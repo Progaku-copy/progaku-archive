@@ -40,6 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 0) do
     t.integer "priority", null: false, comment: "タグの順番"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
     t.index ["priority"], name: "index_tags_on_priority"
   end
 

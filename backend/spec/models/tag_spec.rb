@@ -5,13 +5,14 @@
 # Table name: tags
 #
 #  id                   :bigint           not null, primary key
-#  name(タグ名)         :string(255)      not null
+#  name(タグ名)         :string(30)       not null
 #  priority(タグの順番) :integer          not null
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #
 # Indexes
 #
+#  index_tags_on_name      (name) UNIQUE
 #  index_tags_on_priority  (priority)
 #
 
@@ -48,6 +49,15 @@ RSpec.describe Tag do
       it 'エラーメッセージが「タグ名は30文字以内で入力してください」となっていること' do
         tag.valid?
         expect(tag.errors.full_messages).to eq ['タグ名は30文字以内で入力してください']
+      end
+    end
+
+    context 'タグ名が重複している場合' do
+      let(:tag) { create(:tag) }
+      let(:duplicate_tag) { build(:tag, name: tag.name) }
+
+      it '無効な状態であること' do
+        expect(duplicate_tag).not_to be_valid
       end
     end
 

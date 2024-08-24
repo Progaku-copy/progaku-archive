@@ -25,6 +25,7 @@ create_table "tags", charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', force:
   t.integer "priority", null: false, comment: 'タグの順番'
   t.datetime "created_at", null: false
   t.datetime "updated_at", null: false
+  t.index ["name"], name: "index_tags_on_name", unique: true
   t.index ["priority"], name: "index_tags_on_priority"
 end
 
