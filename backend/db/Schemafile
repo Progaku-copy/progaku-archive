@@ -36,6 +36,7 @@ create_table "memo_tags", charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', f
   t.datetime "updated_at", null: false
   t.index ["memo_id"], name: "index_memo_tags_on_memo_id"
   t.index ["tag_id"], name: "index_memo_tags_on_tag_id"
+  t.index ["memo_id", "tag_id"], name: "index_memo_tags_on_memo_id_and_tag_id", unique: true
 end
 
 add_foreign_key "memo_tags", "memos", column: 'memo_id', name: 'fk_memo_tags_memo_id'

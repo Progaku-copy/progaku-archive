@@ -24,6 +24,7 @@ ActiveRecord::Schema[7.0].define(version: 0) do
     t.bigint "tag_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["memo_id", "tag_id"], name: "index_memo_tags_on_memo_id_and_tag_id", unique: true
     t.index ["memo_id"], name: "index_memo_tags_on_memo_id"
     t.index ["tag_id"], name: "index_memo_tags_on_tag_id"
   end

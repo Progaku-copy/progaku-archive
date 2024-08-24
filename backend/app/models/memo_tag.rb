@@ -12,8 +12,9 @@
 #
 # Indexes
 #
-#  index_memo_tags_on_memo_id  (memo_id)
-#  index_memo_tags_on_tag_id   (tag_id)
+#  index_memo_tags_on_memo_id             (memo_id)
+#  index_memo_tags_on_memo_id_and_tag_id  (memo_id,tag_id) UNIQUE
+#  index_memo_tags_on_tag_id              (tag_id)
 #
 # Foreign Keys
 #
