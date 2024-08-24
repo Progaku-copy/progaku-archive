@@ -22,7 +22,7 @@ class TagsController < ApplicationController
     tag = Tag.find(params[:id])
 
     if tag.update(tag_params)
-      render json: tag
+      head :no_content
     else
       render json: { errors: tag.errors.full_messages }, status: :unprocessable_entity
     end

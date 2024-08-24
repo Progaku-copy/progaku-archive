@@ -79,19 +79,20 @@ RSpec.describe 'Tags' do
     context 'レコードが存在する場合' do
       before { put tag_path(tag_id), params: { tag: { name: 'Update Tag' } } }
 
-      it 'レコードを更新される' do
-        expect(json['name']).to eq('Update Tag')
+      it 'レコードが更新される' do
+        tag1.reload
+        expect(tag1.name).to eq('Update Tag')
       end
 
-      it 'ステータスコード200を返す' do
-        expect(response).to have_http_status(:ok)
+      it 'ステータスコード204を返す' do
+        expect(response).to have_http_status(:no_content) 
       end
     end
 
     context 'レコードが存在しない場合' do
-      let(:tag_id) { 100 }
+      let(:tag_id) { 0 }
 
-      before { put tag_path(tag_id), params: { tag: { name: 'Update Tag'   } } }
+      before { put tag_path(tag_id), params: { tag: { name: 'Update Tag'} } }
 
       it 'ステータスコード404を返す' do
         expect(response).to have_http_status(:not_found)
