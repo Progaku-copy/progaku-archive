@@ -11,7 +11,7 @@ class TagsController < ApplicationController
   def create
     tag = Tag.new(tag_params)
     if tag.save
-      render json: tag, status: :created
+      head :created
     else
       render json: { errors: tag.errors.full_messages }, status: :unprocessable_entity
     end
