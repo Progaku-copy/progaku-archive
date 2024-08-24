@@ -131,7 +131,7 @@ RSpec.describe 'Tags' do
     end
 
     context 'レコードが存在しない場合' do
-      let(:tag_id) { 100 }
+      let(:tag_id) { 0 }
 
       it 'タグが削除されない' do
         expect do
@@ -143,10 +143,16 @@ RSpec.describe 'Tags' do
         delete tag_path(tag_id)
         expect(response).to have_http_status(:not_found)
       end
+    end
 
-      it '見つからないメッセージを返す' do
+    context 'タグの削除に失敗する場合' do
+      before do
+        allow_any_instance_of(Tag).to receive(:destroy).and_return(false)
         delete tag_path(tag_id)
-        expect(response.body).to match(/Couldn't find Tag/)
+      end
+
+      it 'ステータスコード422を返す' do
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

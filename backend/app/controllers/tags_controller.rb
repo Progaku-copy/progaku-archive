@@ -31,8 +31,11 @@ class TagsController < ApplicationController
   # DELETE /tags/:id
   def destroy
     tag = Tag.find(params[:id])
-    tag.destroy
-    head :no_content
+    if tag.destroy
+      head :no_content
+    else
+      render json: { errors: tag.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
