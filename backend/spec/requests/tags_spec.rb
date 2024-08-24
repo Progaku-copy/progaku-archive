@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Tags' do
-  let!(:tag1) { create(:tag, priority: 2) }
-  let!(:tag2) { create(:tag, priority: 1) }
-  let!(:tag3) { create(:tag, priority: 3) }
-  let(:tags) { [tag1, tag2, tag3] }
-  let(:tag_id) { tag1.id }
+  let!(:medium_priority_tag) { create(:tag, priority: 2) }
+  let!(:high_priority_tag) { create(:tag, priority: 1) }
+  let!(:low_priority_tag) { create(:tag, priority: 3) }
+  let(:tags) { [high_priority_tag, medium_priority_tag, low_priority_tag] }
+  let(:tag_id) { medium_priority_tag.id }
 
   def json
     response.parsed_body
@@ -30,7 +30,7 @@ RSpec.describe 'Tags' do
 
     it 'タグ一覧でタグを昇順で返す' do
       tag_priorities = tags.map(&:priority)
-      expect(json.map { |tag| tag['priority'] }).to eq(tag_priorities.sort)
+      expect(json.pluck('priority')).to eq(tag_priorities.sort)
     end
 
     it 'タグ数が正しい' do
@@ -80,19 +80,19 @@ RSpec.describe 'Tags' do
       before { put tag_path(tag_id), params: { tag: { name: 'Update Tag' } } }
 
       it 'レコードが更新される' do
-        tag1.reload
-        expect(tag1.name).to eq('Update Tag')
+        medium_priority_tag.reload
+        expect(medium_priority_tag.name).to eq('Update Tag')
       end
 
       it 'ステータスコード204を返す' do
-        expect(response).to have_http_status(:no_content) 
+        expect(response).to have_http_status(:no_content)
       end
     end
 
     context 'レコードが存在しない場合' do
       let(:tag_id) { 0 }
 
-      before { put tag_path(tag_id), params: { tag: { name: 'Update Tag'} } }
+      before { put tag_path(tag_id), params: { tag: { name: 'Update Tag' } } }
 
       it 'ステータスコード404を返す' do
         expect(response).to have_http_status(:not_found)
@@ -147,7 +147,8 @@ RSpec.describe 'Tags' do
 
     context 'タグの削除に失敗する場合' do
       before do
-        allow_any_instance_of(Tag).to receive(:destroy).and_return(false)
+        allow(Tag).to receive(:find).and_return(medium_priority_tag)
+        allow(medium_priority_tag).to receive(:destroy).and_return(false)
         delete tag_path(tag_id)
       end
 
