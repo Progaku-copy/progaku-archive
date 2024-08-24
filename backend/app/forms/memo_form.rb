@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MemoForm
-  include ActiveModel::Model
+  include ActiveModel::Validations
 
   attr_accessor :title, :content, :tag_ids
 
