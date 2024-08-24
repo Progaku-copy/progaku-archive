@@ -38,6 +38,19 @@ RSpec.describe Tag do
       end
     end
 
+    context 'タグ名が31文字以上の場合' do
+      let(:tag) { build(:tag, name: 'a' * 31) }
+
+      it '無効な状態であること' do
+        expect(tag).not_to be_valid
+      end
+
+      it 'エラーメッセージが「タグ名は30文字以内で入力してください」となっていること' do
+        tag.valid?
+        expect(tag.errors.full_messages).to eq ['タグ名は30文字以内で入力してください']
+      end
+    end
+
     context 'タグの順番がない場合' do
       let(:tag) { build(:tag, priority: nil) }
 
