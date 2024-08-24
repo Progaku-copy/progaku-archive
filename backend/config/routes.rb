@@ -3,5 +3,5 @@ Rails.application.routes.draw do
     resources :comments, only: %i[create]
   end
 
-  resources :tags, only: %i[index show create update destroy]
+  resources :tags, only: %i[index create update destroy]
 end

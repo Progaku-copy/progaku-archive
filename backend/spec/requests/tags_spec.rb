@@ -27,32 +27,6 @@ RSpec.describe 'Tags' do
     end
   end
 
-  describe 'GET /tags/:id' do
-    before { get tag_path(tag_id) }
-
-    context 'レコードが存在する場合' do
-      it 'タグを返す' do
-        expect(json['id']).to eq(tag_id)
-      end
-
-      it 'ステータスコード200を返す' do
-        expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context 'レコードが存在しない場合' do
-      let(:tag_id) { 100 }
-
-      it 'ステータスコード404を返す' do
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it '見つからないメッセージを返す' do
-        expect(response.body).to match(/Couldn't find Tag/)
-      end
-    end
-  end
-
   describe 'POST /tags' do
     context 'リクエストが有効な場合' do
       it 'タグが作成される' do
