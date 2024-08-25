@@ -12,6 +12,16 @@ class CommentsController < ApplicationController
     end
   end
 
+  def destroy
+    comment = Comment.find_by!(id: params[:id], memo_id: params[:memo_id])
+
+    if comment.destroy
+      head :no_content
+    else
+      render json: { errors: comment.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def comment_params

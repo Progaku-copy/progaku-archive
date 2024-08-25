@@ -33,4 +33,66 @@ RSpec.describe 'CommentsController' do
       end
     end
   end
+
+  describe 'DELETE /memos/:memo_id/comments/:id' do
+    context 'コメントが存在する場合' do
+      let!(:memo) { create(:memo) }
+      let!(:comment) { create(:comment, memo: memo) }
+
+      it 'コメントが削除され、204になる' do
+        aggregate_failures do
+          expect do
+            delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
+          end.to change(Comment, :count).by(-1)
+          expect(response).to have_http_status(:no_content)
+        end
+      end
+    end
+
+    context 'コメントが存在しない場合' do
+      let!(:memo) { create(:memo) }
+
+      it '404が返ることを確認する' do
+        aggregate_failures do
+          expect do
+            delete "/memos/#{memo.id}/comments/0", as: :json
+          end.not_to change(Comment, :count)
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    context 'メモが存在しない場合' do
+      let!(:memo) { create(:memo) }
+      let!(:comment) { create(:comment, memo: memo) }
+
+      it '404が返ることを確認する' do
+        aggregate_failures do
+          expect do
+            delete "/memos/0/comments/#{comment.id}", as: :json
+          end.not_to change(Comment, :count)
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    context 'コメントの削除に失敗した場合' do
+      let!(:memo) { create(:memo) }
+      let!(:comment) { create(:comment, memo: memo) }
+
+      before do
+        allow(Comment).to receive(:find_by).and_return(comment)
+        allow(comment).to receive(:destroy).and_return(false)
+      end
+
+      it '422が返ることを確認する' do
+        aggregate_failures do
+          expect do
+            delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
+          end.not_to change(Comment, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+  end
 end
