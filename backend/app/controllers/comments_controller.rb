@@ -12,6 +12,16 @@ class CommentsController < ApplicationController
     end
   end
 
+  # PUT /memos/:memo_id/comments/:id
+  def update
+    comment = Comment.find_by!(id: params[:id], memo_id: params[:memo_id])
+    if comment.update(comment_params)
+      head :no_content
+    else
+      render json: { errors: comment.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def comment_params
