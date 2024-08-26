@@ -161,10 +161,16 @@ RSpec.describe 'MemosController' do
     let!(:non_searchable_memo) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
 
     context 'タイトルで検索した場合' do
-      it 'タイトルフィルターが正しく機能することを確認する' do
-        params = { title: 'テスト' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
-        expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2)
+      it 'タイトルフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
+        aggregate_failures do
+          get '/memos', params: { title: 'テスト' }
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['memos'].length).to eq(2)
+
+          result_memo_ids = response.parsed_body['memos'].map { |item| item['id'] }
+          expected_memo_ids = [searchable_memo_1.id, searchable_memo_2.id]
+          expect(result_memo_ids).to eq(expected_memo_ids)
+        end
       end
     end
 
