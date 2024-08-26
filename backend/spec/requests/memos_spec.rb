@@ -154,8 +154,8 @@ RSpec.describe 'MemosController' do
       end
     end
   end
-
-  describe 'SearchResolver' do
+  
+  describe 'GET /memos?title={title}' do
     let!(:searchable_memo_1) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
     let!(:searchable_memo_2) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
     let!(:non_searchable_memo) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
