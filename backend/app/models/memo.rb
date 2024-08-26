@@ -18,12 +18,12 @@ class Memo < ApplicationRecord
     FILTERS = %i[TitleFilter ContentFilter OrderFilter].freeze
     private_constant :FILTERS
 
-    # @param filter_collection [ActiveRecord::Relation[Memo]]
+    # @param memos [ActiveRecord::Relation[Memo]]
     # @param filter_params [ActionController::Parameters]
     # @return [ActiveRecord::Relation[Memo]]
-    def self.resolve(filter_collection:, filter_params:)
+    def self.resolve(memos:, filter_params:)
       filter_params[:order] ||= 'desc'
-      FILTERS.reduce(filter_collection) do |memo_scope, filter|
+      FILTERS.reduce(memos) do |memo_scope, filter|
         const_get(filter).resolve(scope: memo_scope, params: filter_params)
       end
     end
