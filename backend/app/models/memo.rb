@@ -30,13 +30,6 @@ class Memo < ApplicationRecord
 
     private
 
-    def resolve
-      filter_params[:order] ||= 'desc'
-      FILTERS.reduce(filter_collection) do |memo_scope, filter|
-        const_get(filter).resolve(scope: memo_scope, params: filter_params)
-      end
-    end
-
     module TitleFilter
       def self.resolve(scope:, params:)
         return scope if params[:title].blank?
