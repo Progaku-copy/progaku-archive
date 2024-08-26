@@ -156,15 +156,15 @@ RSpec.describe 'MemosController' do
   end
 
   describe 'SearchResolver' do
-    let!(:test_memo_first) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
-    let!(:another_title_memo) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
-    let!(:test_memo_third) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
+    let!(:searchable_memo_1) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
+    let!(:searchable_memo_2) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
+    let!(:non_searchable_memo) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
 
     context 'タイトルで検索した場合' do
       it 'タイトルフィルターが正しく機能することを確認する' do
         filter_params = { title: 'テスト' }
         result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
-        expect(result).to contain_exactly(test_memo_first, test_memo_third)
+        expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2)
       end
     end
 
@@ -172,7 +172,7 @@ RSpec.describe 'MemosController' do
       it 'コンテンツフィルターが正しく機能することを確認する' do
         filter_params = { content: 'コンテンツ' }
         result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
-        expect(result).to contain_exactly(test_memo_first, another_title_memo, test_memo_third)
+        expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2, non_searchable_memo)
       end
     end
 
@@ -180,7 +180,7 @@ RSpec.describe 'MemosController' do
       it '並び替え機能が正しく機能することを確認する' do
         filter_params = { order: 'desc' }
         result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
-        expect(result).to eq([test_memo_third, another_title_memo, test_memo_first])
+        expect(result).to eq([non_searchable_memo, searchable_memo_2, searchable_memo_1])
       end
     end
 
@@ -188,7 +188,7 @@ RSpec.describe 'MemosController' do
       it 'タイトルとコンテンツフィルターが正しく機能することを確認する' do
         filter_params = { title: 'テスト', content: 'コンテンツ', order: 'desc' }
         result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
-        expect(result).to eq([test_memo_third, test_memo_first])
+        expect(result).to eq([searchable_memo_2, searchable_memo_1])
       end
     end
 
@@ -196,7 +196,7 @@ RSpec.describe 'MemosController' do
       it '全てのメモが返されることを確認する' do
         filter_params = {}
         result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
-        expect(result).to contain_exactly(test_memo_first, another_title_memo, test_memo_third)
+        expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2, non_searchable_memo)
       end
     end
   end
