@@ -3,8 +3,7 @@
 class MemosController < ApplicationController
   # GET /memos
   def index
-    memos = Memo.all
-    @memos = Memo::SearchResolver.resolve(memos: memos, params: params)
+    @memos = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
     render json: { memos: @memos }, status: :ok
   end
 
