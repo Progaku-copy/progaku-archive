@@ -163,7 +163,7 @@ RSpec.describe 'MemosController' do
     context 'タイトルで検索した場合' do
       it 'タイトルフィルターが正しく機能することを確認する' do
         filter_params = { title: 'テスト' }
-        result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
         expect(result).to contain_exactly(test_memo_first, test_memo_third)
       end
     end
@@ -171,7 +171,7 @@ RSpec.describe 'MemosController' do
     context 'コンテンツで検索した場合' do
       it 'コンテンツフィルターが正しく機能することを確認する' do
         filter_params = { content: 'コンテンツ' }
-        result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
         expect(result).to contain_exactly(test_memo_first, another_title_memo, test_memo_third)
       end
     end
@@ -179,7 +179,7 @@ RSpec.describe 'MemosController' do
     context '並び替え機能のテスト' do
       it '並び替え機能が正しく機能することを確認する' do
         filter_params = { order: 'desc' }
-        result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
         expect(result).to eq([test_memo_third, another_title_memo, test_memo_first])
       end
     end
@@ -187,7 +187,7 @@ RSpec.describe 'MemosController' do
     context 'タイトルとコンテンツで検索した場合' do
       it 'タイトルとコンテンツフィルターが正しく機能することを確認する' do
         filter_params = { title: 'テスト', content: 'コンテンツ', order: 'desc' }
-        result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
         expect(result).to eq([test_memo_third, test_memo_first])
       end
     end
@@ -195,7 +195,7 @@ RSpec.describe 'MemosController' do
     context '検索内容を入力しない場合' do
       it '全てのメモが返されることを確認する' do
         filter_params = {}
-        result = Memo::SearchResolver.resolve(filter_collection: Memo.all, filter_params: filter_params)
+        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
         expect(result).to contain_exactly(test_memo_first, another_title_memo, test_memo_third)
       end
     end
