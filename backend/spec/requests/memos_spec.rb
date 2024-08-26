@@ -154,7 +154,7 @@ RSpec.describe 'MemosController' do
       end
     end
   end
-  
+
   describe 'GET /memos?title={title}' do
     let!(:searchable_memo_1) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
     let!(:searchable_memo_2) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
@@ -162,40 +162,40 @@ RSpec.describe 'MemosController' do
 
     context 'タイトルで検索した場合' do
       it 'タイトルフィルターが正しく機能することを確認する' do
-        filter_params = { title: 'テスト' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
+        params = { title: 'テスト' }
+        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
         expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2)
       end
     end
 
     context 'コンテンツで検索した場合' do
       it 'コンテンツフィルターが正しく機能することを確認する' do
-        filter_params = { content: 'コンテンツ' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
+        params = { content: 'コンテンツ' }
+        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
         expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2, non_searchable_memo)
       end
     end
 
     context '並び替え機能のテスト' do
       it '並び替え機能が正しく機能することを確認する' do
-        filter_params = { order: 'desc' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
+        params = { order: 'desc' }
+        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
         expect(result).to eq([non_searchable_memo, searchable_memo_2, searchable_memo_1])
       end
     end
 
     context 'タイトルとコンテンツで検索した場合' do
       it 'タイトルとコンテンツフィルターが正しく機能することを確認する' do
-        filter_params = { title: 'テスト', content: 'コンテンツ', order: 'desc' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
+        params = { title: 'テスト', content: 'コンテンツ', order: 'desc' }
+        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
         expect(result).to eq([searchable_memo_2, searchable_memo_1])
       end
     end
 
     context '検索内容を入力しない場合' do
       it '全てのメモが返されることを確認する' do
-        filter_params = {}
-        result = Memo::SearchResolver.resolve(memos: Memo.all, filter_params: filter_params)
+        params = {}
+        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
         expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2, non_searchable_memo)
       end
     end

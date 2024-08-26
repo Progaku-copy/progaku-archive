@@ -19,12 +19,12 @@ class Memo < ApplicationRecord
     private_constant :FILTERS
 
     # @param memos [ActiveRecord::Relation[Memo]]
-    # @param filter_params [ActionController::Parameters]
+    # @param params [ActionController::Parameters]
     # @return [ActiveRecord::Relation[Memo]]
-    def self.resolve(memos:, filter_params:)
-      filter_params[:order] ||= 'desc'
+    def self.resolve(memos:, params:)
+      params[:order] ||= 'desc'
       FILTERS.reduce(memos) do |memo_scope, filter|
-        const_get(filter).resolve(scope: memo_scope, params: filter_params)
+        const_get(filter).resolve(scope: memo_scope, params: params)
       end
     end
 
