@@ -154,12 +154,14 @@ RSpec.describe 'MemosController' do
       end
     end
   end
+end
+
+RSpec.describe 'Memos Search' do
+  let!(:searchable_memo_1) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
+  let!(:searchable_memo_2) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
+  let!(:non_searchable_memo) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
 
   describe 'GET /memos?title={title}' do
-    let!(:searchable_memo_1) { create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
-    let!(:searchable_memo_2) { create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
-    let!(:non_searchable_memo) { create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ') }
-
     context 'タイトルで検索した場合' do
       it 'タイトルフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
         aggregate_failures do
@@ -168,41 +170,54 @@ RSpec.describe 'MemosController' do
           expect(response.parsed_body['memos'].length).to eq(2)
 
           result_memo_ids = response.parsed_body['memos'].map { |item| item['id'] }
-          expected_memo_ids = [searchable_memo_1.id, searchable_memo_2.id]
+          expected_memo_ids = [searchable_memo_2.id, searchable_memo_1.id]
+          expect(result_memo_ids).to eq(expected_memo_ids)
+        end
+      end
+    end
+  end
+  describe 'GET /memos?content={content}' do
+    context 'コンテンツで検索した場合' do
+      it 'コンテンツフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
+        aggregate_failures do
+          get '/memos', params: { content: 'コンテンツ' }
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['memos'].length).to eq(3)
+
+          result_memo_ids = response.parsed_body['memos'].map { |item| item['id'] }
+          expected_memo_ids = [non_searchable_memo.id, searchable_memo_2.id, searchable_memo_1.id]
+          expect(result_memo_ids).to eq(expected_memo_ids)
+        end
+      end
+    end
+  end
+
+  describe 'GET /memos?order={order}' do
+    context 'デフォルト（降順）の並び替え機能のテスト' do
+      it '降順での並び替え機能が正しく機能し、期待されるメモが取得できることを確認する' do
+        aggregate_failures do
+          get '/memos'
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['memos'].length).to eq(3)
+
+          result_memo_ids = response.parsed_body['memos'].map { |item| item['id'] }
+          expected_memo_ids = [non_searchable_memo.id, searchable_memo_2.id, searchable_memo_1.id]
           expect(result_memo_ids).to eq(expected_memo_ids)
         end
       end
     end
 
-    context 'コンテンツで検索した場合' do
-      it 'コンテンツフィルターが正しく機能することを確認する' do
-        params = { content: 'コンテンツ' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
-        expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2, non_searchable_memo)
-      end
-    end
-
     context '並び替え機能のテスト' do
-      it '並び替え機能が正しく機能することを確認する' do
-        params = { order: 'desc' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
-        expect(result).to eq([non_searchable_memo, searchable_memo_2, searchable_memo_1])
-      end
-    end
+      it '昇順での並び替え機能が正しく機能し、期待されるメモが取得できることを確認する' do
+        aggregate_failures do
+          get '/memos', params: { order: 'asc' }
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['memos'].length).to eq(3)
 
-    context 'タイトルとコンテンツで検索した場合' do
-      it 'タイトルとコンテンツフィルターが正しく機能することを確認する' do
-        params = { title: 'テスト', content: 'コンテンツ', order: 'desc' }
-        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
-        expect(result).to eq([searchable_memo_2, searchable_memo_1])
-      end
-    end
-
-    context '検索内容を入力しない場合' do
-      it '全てのメモが返されることを確認する' do
-        params = {}
-        result = Memo::SearchResolver.resolve(memos: Memo.all, params: params)
-        expect(result).to contain_exactly(searchable_memo_1, searchable_memo_2, non_searchable_memo)
+          result_memo_ids = response.parsed_body['memos'].map { |item| item['id'] }
+          expected_memo_ids = [searchable_memo_1.id, searchable_memo_2.id, non_searchable_memo.id]
+          expect(result_memo_ids).to eq(expected_memo_ids)
+        end
       end
     end
   end
