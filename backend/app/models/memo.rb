@@ -22,7 +22,6 @@ class Memo < ApplicationRecord
     # @param params [ActionController::Parameters]
     # @return [ActiveRecord::Relation[Memo]]
     def self.resolve(memos:, params:)
-      params[:order] ||= 'desc'
       FILTERS.reduce(memos) do |memo_scope, filter|
         const_get(filter).resolve(scope: memo_scope, params: params)
       end
@@ -49,10 +48,11 @@ class Memo < ApplicationRecord
     private_constant :ContentFilter
 
     module OrderFilter
-      def self.resolve(scope:, params:)
-        return scope if params[:order].blank?
+      DEFAULT_ORDER = 'desc'
+      private_constant :DEFAULT_ORDER
 
-        scope.order(id: params[:order])
+      def self.resolve(scope:, params:)
+        scope.order(id: params[:order].presence || DEFAULT_ORDER)
       end
     end
     private_constant :OrderFilter
