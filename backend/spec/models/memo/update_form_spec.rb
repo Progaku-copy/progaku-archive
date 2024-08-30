@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
+# rubocop:disable RSpec/MultipleMemoizedHelpers
 RSpec.describe Memo::UpdateForm do
   let!(:tag) { create(:tag) }
-  let!(:tags) { create_list(:tag, 2) }
+  let(:tags) { create_list(:tag, 2) }
   let!(:memo) { create(:memo) }
-  let!(:memo_tags) { create(:memo_tag, memo: memo, tag: tag) }
   let(:tag_ids) { tags.map(&:id) }
 
+  before { create(:memo_tag, memo: memo, tag: tag) }
 
   describe '#バリデーション' do
     context 'フォームの値が有効な場合' do
@@ -30,7 +31,7 @@ RSpec.describe Memo::UpdateForm do
     context 'メモの内容が空文字の場合' do
       let(:params) { { content: '', tag_ids: tag_ids } }
       let(:memo_update_form) { described_class.new(params: params, memo: memo) }
-      
+
       specify '無効な状態であること' do
         expect(memo_update_form).not_to be_valid
       end
@@ -75,3 +76,4 @@ RSpec.describe Memo::UpdateForm do
     end
   end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers

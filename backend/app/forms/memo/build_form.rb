@@ -32,7 +32,7 @@ class Memo::BuildForm
 
   def memo_valid?
     return if memo.valid?
-  
+
     memo.errors.each { |error| errors.add(:base, error.full_message) }
   end
 
