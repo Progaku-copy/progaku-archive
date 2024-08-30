@@ -25,8 +25,10 @@ class Memo
       resolve_memo_tags
 
       ActiveRecord::Base.transaction do
-        memo.save!
+        memo.save
       end
+
+      true
     end
 
     private

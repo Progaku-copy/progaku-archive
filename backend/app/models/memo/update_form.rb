@@ -19,8 +19,10 @@ class Memo
       resolve_memo_tags
 
       ActiveRecord::Base.transaction do
-        memo.update!(content: params[:content])
+        memo.update(content: params[:content])
       end
+
+      true
     end
 
     private
