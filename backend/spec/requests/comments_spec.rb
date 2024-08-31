@@ -108,7 +108,7 @@ RSpec.describe 'CommentsController' do
     context 'コメントが存在しない場合' do
       let!(:memo) { create(:memo) }
 
-      it '404が返ることを確認する' do
+      it '404が返る' do
         aggregate_failures do
           expect do
             delete "/memos/#{memo.id}/comments/0", as: :json
@@ -122,7 +122,7 @@ RSpec.describe 'CommentsController' do
       let!(:memo) { create(:memo) }
       let!(:comment) { create(:comment, memo: memo) }
 
-      it '404が返ることを確認する' do
+      it '404が返る' do
         aggregate_failures do
           expect do
             delete "/memos/0/comments/#{comment.id}", as: :json
@@ -141,7 +141,7 @@ RSpec.describe 'CommentsController' do
         allow(comment).to receive(:destroy).and_return(false)
       end
 
-      it '422が返ることを確認する' do
+      it '422が返る' do
         aggregate_failures do
           expect do
             delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
