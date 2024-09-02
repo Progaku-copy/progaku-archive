@@ -27,8 +27,6 @@ class Memo < ApplicationRecord
       end
     end
 
-    private
-
     module TitleFilter
       def self.resolve(scope:, params:)
         return scope if params[:title].blank?
