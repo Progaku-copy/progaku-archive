@@ -82,17 +82,17 @@ RSpec.describe Memo do
     end
   end
 
-  describe "検索機能のテスト" do
-    let!(:memo_1) { Memo.create(title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
-    let!(:memo_2) { Memo.create(title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
-    let!(:non_memo) { Memo.create(title: 'その他 タイトル', content: 'その他 コンテンツ') }
+  describe '検索機能のテスト' do
+    let!(:searchable_memo_one) { described_class.create(title: 'テスト タイトル１', content: 'テスト コンテンツ１') }
+    let!(:searchable_memo_two) { described_class.create(title: 'テスト タイトル２', content: 'テスト コンテンツ２') }
+    let!(:non_searchable_memo) { described_class.create(title: 'その他 タイトル', content: 'その他 コンテンツ') }
 
     context 'タイトルで検索した場合' do
       it 'タイトルフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
         aggregate_failures do
-          result = Memo::SearchResolver.resolve(memos: Memo.all, params: { title: 'テスト' })
-          expect(result).to include(memo_1, memo_2)
-          expect(result).to_not include(non_memo)
+          result = Memo::SearchResolver.resolve(memos: described_class.all, params: { title: 'テスト' })
+          expect(result).to include(searchable_memo_one, searchable_memo_two)
+          expect(result).not_to include(non_searchable_memo)
         end
       end
     end
@@ -100,8 +100,8 @@ RSpec.describe Memo do
     context 'コンテンツで検索した場合' do
       it 'コンテンツフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
         aggregate_failures do
-          result = Memo::SearchResolver.resolve(memos: Memo.all, params: { content: 'コンテンツ' })
-          expect(result).to include(memo_1, memo_2, non_memo)
+          result = Memo::SearchResolver.resolve(memos: described_class.all, params: { content: 'コンテンツ' })
+          expect(result).to include(searchable_memo_one, searchable_memo_two, non_searchable_memo)
         end
       end
     end
@@ -109,9 +109,9 @@ RSpec.describe Memo do
     context 'タイトルとコンテンツで検索した場合' do
       it 'タイトルとコンテンツの両方でフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
         aggregate_failures do
-          result = Memo::SearchResolver.resolve(memos: Memo.all, params: { title: 'その他', content: 'コンテンツ'})
-          expect(result).to include(non_memo)
-          expect(result).to_not include(memo_1, memo_2)
+          result = Memo::SearchResolver.resolve(memos: described_class.all, params: { title: 'その他', content: 'コンテンツ' })
+          expect(result).to include(non_searchable_memo)
+          expect(result).not_to include(searchable_memo_one, searchable_memo_two)
         end
       end
     end
@@ -119,15 +119,15 @@ RSpec.describe Memo do
     context '並び替え機能のテスト' do
       it '昇順機能が正しく機能していること' do
         aggregate_failures do
-          result = Memo::SearchResolver.resolve(memos: Memo.all, params: { order: 'asc' })
-          expect(result).to eq([memo_1, memo_2, non_memo])
+          result = Memo::SearchResolver.resolve(memos: described_class.all, params: { order: 'asc' })
+          expect(result).to eq([searchable_memo_one, searchable_memo_two, non_searchable_memo])
         end
       end
 
       it 'デフォルトで降順機能が正しく機能されていること' do
         aggregate_failures do
-          result = Memo::SearchResolver.resolve(memos: Memo.all, params: {})
-          expect(result).to eq([non_memo, memo_2, memo_1])
+          result = Memo::SearchResolver.resolve(memos: described_class.all, params: {})
+          expect(result).to eq([non_searchable_memo, searchable_memo_two, searchable_memo_one])
         end
       end
     end
