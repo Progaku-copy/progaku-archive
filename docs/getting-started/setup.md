@@ -161,7 +161,7 @@ docker compose up -d
 docker compose ps
 # 出力結果:
 # NAME          IMAGE                     COMMAND                                               SERVICE   CREATED          STATUS                   PORTS
-# pa_backend    progaku-archive-backend   "sh -c 'rm -f tmp/pids/server.pid && bundle exec …"   backend   26 seconds ago   Up 25 seconds            0.0.0.0:3000->3000/tcp
+# pa_backend    progaku-archive-backend   "sh -c 'rm -f tmp/pids/server.pid && bundle exec …"   backend   26 seconds ago   Up 25 seconds            0.0.0.0:8080->8080/tcp
 # pa_database   mysql:8.0                 "docker-entrypoint.sh mysqld"                         db        6 minutes ago    Up 6 minutes (healthy)   0.0.0.0:3306->3306/tcp, 33060/tcp
 ```
 
@@ -170,4 +170,4 @@ docker compose ps
 ## 5. 確認
 <img width="1265" alt="スクリーンショット 2024-06-18 20 35 35" src="https://github.com/Progaku-copy/progaku-archive/assets/115006129/cd3a44f0-594a-4ebd-8625-a9dc15f5b143">
 
-ブラウザで `localhost:3000` を入力し、Railsのウェルカムページが表示されれば環境構築は成功です。
+ブラウザで `localhost:8080` を入力し、Railsのウェルカムページが表示されれば環境構築は成功です。
