@@ -60,6 +60,7 @@ touch backend.env
 ```plaintext
 DATABASE_URL=mysql2://root:root@db/app_development
 DATABASE_TEST_URL=mysql2://root:root@db/app_test
+FRONTEND_DOMAIN=http://localhost:3000 /新規追加(CORSで許可するフロント側のドメインを設定)
 ```
 
 ### backend.env の作成方法
@@ -71,10 +72,11 @@ cp backend.env.template backend.env
 ```
 
 backend.env ファイルの内容は以下のようになります。
-
+環境変数の設定値は、必要に応じて変更してください。
 ```plaintext
 DATABASE_URL=mysql2://root:root@db/app_development
 DATABASE_TEST_URL=mysql2://root:root@db/app_test
+FRONTEND_DOMAIN=http://localhost:3000
 ```
 
 この設定ファイルの意味は以下の通りです。
