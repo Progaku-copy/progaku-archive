@@ -33,5 +33,4 @@ ActiveRecord::Schema[7.0].define(version: 0) do
     t.timestamp "updated_at", null: false
   end
 
-  add_foreign_key "comments", "memos", name: "fk_comments_memo_id"
 end
