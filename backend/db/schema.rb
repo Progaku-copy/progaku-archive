@@ -27,10 +27,12 @@ ActiveRecord::Schema[7.0].define(version: 0) do
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "email", null: false, comment: "ユーザーのEmailアドレス"
-    t.string "password", null: false, comment: "ユーザーのpassword"
+    t.string "account_name", limit: 60, null: false, comment: "ユーザーの名前"
+    t.string "password_digest", limit: 60, null: false, comment: "ユーザーのpassword"
+    t.boolean "admin", default: false, null: false, comment: "管理者フラグ"
     t.timestamp "created_at", null: false
     t.timestamp "updated_at", null: false
+    t.index ["account_name"], name: "index_users_on_account_name", unique: true
   end
 
   add_foreign_key "comments", "memos", name: "fk_comments_memo_id"
