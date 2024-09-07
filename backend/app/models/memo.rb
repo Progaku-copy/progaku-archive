@@ -14,7 +14,7 @@ class Memo < ApplicationRecord
   validates :title, :content, presence: true
   has_many :comments, dependent: :destroy
 
-  module SearchResolver
+  module Query
     FILTERS = %i[TitleFilter ContentFilter OrderFilter].freeze
     private_constant :FILTERS
 
