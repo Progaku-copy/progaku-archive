@@ -50,9 +50,9 @@ RSpec.describe 'Tags' do
         end.to change(Tag, :count).by(1)
       end
 
-      it 'ステータスコード201を返す' do
+      it 'ステータスコード204を返す' do
         post tags_path, params: { tag: { name: 'New Tag', priority: 1 } }
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:no_content)
       end
     end
 
