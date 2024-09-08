@@ -103,10 +103,8 @@ RSpec.describe Memo do
 
     context 'コンテンツで検索した場合' do
       it 'コンテンツフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
-        aggregate_failures do
-          result = Memo::Query.resolve(memos: described_class.all, params: { content: 'コンテンツ' })
-          expect(result).to include(memos['1'], memos['2'], memos['3'])
-        end
+        result = Memo::Query.resolve(memos: described_class.all, params: { content: 'コンテンツ' })
+        expect(result).to include(memos['1'], memos['2'], memos['3'])
       end
     end
 
@@ -122,10 +120,8 @@ RSpec.describe Memo do
 
     context '並び替え機能のテスト' do
       it '昇順機能が正しく機能していること' do
-        aggregate_failures do
-          result = Memo::Query.resolve(memos: described_class.all, params: { order: 'asc' })
-          expect(result).to eq([memos['1'], memos['2'], memos['3']])
-        end
+        result = Memo::Query.resolve(memos: described_class.all, params: { order: 'asc' })
+        expect(result).to eq([memos['1'], memos['2'], memos['3']])
       end
 
       it 'デフォルトで降順機能が正しく機能されていること' do
