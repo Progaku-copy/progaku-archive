@@ -1,0 +1,45 @@
+paths:
+  /tags:
+    get:
+      tags:
+        - タグ
+      summary: タグ一覧取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../components/tagSchema.yml#/components/schemas/tag'
+    post:
+      tags:
+        - タグ
+      summary: タグ作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "タグの名前"
+                priority:
+                  type: integer
+                  example: 1
+      responses:
+        '204' :
+          description: No Content
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "error message"
