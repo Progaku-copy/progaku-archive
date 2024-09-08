@@ -4,7 +4,7 @@ class TagsController < ApplicationController
   # GET /tags
   def index
     tags = Tag.all
-    render json: tags.order(priority: :asc), only: [:id, :name, :priority], status: :ok
+    render json: tags.order(priority: :asc), only: %i[id name priority], status: :ok
   end
 
   # POST /tags
