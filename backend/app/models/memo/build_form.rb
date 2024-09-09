@@ -12,13 +12,6 @@ class Memo
       @params = params
     end
 
-    def memo
-      @memo ||= Memo.new(
-        title: params[:title],
-        content: params[:content]
-      )
-    end
-
     def save
       return false unless valid?
 
@@ -32,6 +25,13 @@ class Memo
     end
 
     private
+
+    def memo
+      @memo ||= Memo.new(
+        title: params[:title],
+        content: params[:content]
+      )
+    end
 
     def memo_valid?
       return if memo.valid? # rubocop:disable Style/ReturnNilInPredicateMethodDefinition
