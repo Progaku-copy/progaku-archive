@@ -30,7 +30,7 @@ class MemosController < ApplicationController
     memo = Memo.find(params[:id])
     form = Memo::UpdateForm.new(params: update_params, memo: memo)
 
-    if form.update
+    if form.save
       head :no_content
     else
       render json: { errors: form.errors.full_messages }, status: :unprocessable_entity

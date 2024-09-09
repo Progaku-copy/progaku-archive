@@ -19,11 +19,11 @@ RSpec.describe Memo::UpdateForm do
       end
 
       specify 'メモの内容が更新されること' do
-        expect { memo_update_form.update }.to change { memo.reload.content }.to('Updated memo content')
+        expect { memo_update_form.save }.to change { memo.reload.content }.to('Updated memo content')
       end
 
       specify 'メモのタグが更新されること' do
-        memo_update_form.update
+        memo_update_form.save
         expect(memo.reload.tags.pluck(:id)).to match_array(tag_ids)
       end
     end
@@ -43,22 +43,22 @@ RSpec.describe Memo::UpdateForm do
     end
   end
 
-  describe '#update' do
+  describe '#save' do
     context 'フォームの値が有効な場合' do
       let(:params) { { content: 'Updated memo content', tag_ids: tag_ids } }
       let(:memo_update_form) { described_class.new(params: params, memo: memo) }
 
       specify 'メモの内容が更新されること' do
-        expect { memo_update_form.update }.to change { memo.reload.content }.to('Updated memo content')
+        expect { memo_update_form.save }.to change { memo.reload.content }.to('Updated memo content')
       end
 
       specify 'メモのタグが更新されること' do
-        memo_update_form.update
+        memo_update_form.save
         expect(memo.reload.tags.pluck(:id)).to match_array(tag_ids)
       end
 
       specify 'trueが返されること' do
-        expect(memo_update_form.update).to be_truthy
+        expect(memo_update_form.save).to be_truthy
       end
     end
 
@@ -67,11 +67,11 @@ RSpec.describe Memo::UpdateForm do
       let(:memo_update_form) { described_class.new(params: params, memo: memo) }
 
       specify 'メモの内容が更新されないこと' do
-        expect { memo_update_form.update }.not_to(change { memo.reload.content })
+        expect { memo_update_form.save }.not_to(change { memo.reload.content })
       end
 
       specify 'falseが返されること' do
-        expect(memo_update_form.update).to be_falsey
+        expect(memo_update_form.save).to be_falsey
       end
     end
   end

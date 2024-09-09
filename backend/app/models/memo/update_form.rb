@@ -13,7 +13,7 @@ class Memo
       @memo = memo
     end
 
-    def update
+    def save
       return false unless valid?
 
       resolve_memo_tags
