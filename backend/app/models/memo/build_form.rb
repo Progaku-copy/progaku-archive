@@ -4,8 +4,6 @@ class Memo
   class BuildForm
     include ActiveModel::Validations
 
-    attr_reader :params
-
     validate :memo_valid?
 
     def initialize(params:)
@@ -25,6 +23,8 @@ class Memo
     end
 
     private
+
+    attr_reader :params
 
     def memo
       @memo ||= Memo.new(
