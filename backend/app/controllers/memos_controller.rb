@@ -16,24 +16,24 @@ class MemosController < ApplicationController
 
   # POST /memos
   def create
-    memo_form = Memo::BuildForm.new(params: create_params)
+    form = Memo::BuildForm.new(params: create_params)
 
-    if memo_form.save
+    if form.save
       head :no_content
     else
-      render json: { errors: memo_form.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: form.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   # PUT /memos/:id
   def update
     memo = Memo.find(params[:id])
-    memo_form = Memo::UpdateForm.new(params: update_params, memo: memo)
+    form = Memo::UpdateForm.new(params: update_params, memo: memo)
 
-    if memo_form.update
+    if form.update
       head :no_content
     else
-      render json: { errors: memo_form.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: form.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -47,10 +47,10 @@ class MemosController < ApplicationController
   private
 
   def create_params
-    params.require(:memo_form).permit(:title, :content, tag_ids: [])
+    params.require(:form).permit(:title, :content, tag_ids: [])
   end
 
   def update_params
-    params.require(:memo_form).permit(:content, tag_ids: [])
+    params.require(:form).permit(:content, tag_ids: [])
   end
 end
