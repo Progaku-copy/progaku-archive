@@ -5,7 +5,7 @@ RSpec.describe 'MemosController' do
     context 'メモが存在する場合' do
       let!(:memos) { create_list(:memo, 3) }
 
-      it '全てのメモが取得でき降順で並び変えられていることを確認する' do
+      it '全てのメモが降順で返る' do
         aggregate_failures do
           get '/memos'
           expect(response).to have_http_status(:ok)
@@ -24,7 +24,7 @@ RSpec.describe 'MemosController' do
       let!(:memo) { create(:memo) }
       let!(:comments) { create_list(:comment, 3, memo: memo) }
 
-      it '指定したメモ、コメントが取得できることを確認する' do
+      it '指定したメモ、コメントが返る' do
         aggregate_failures do
           get "/memos/#{memo.id}", headers: { Accept: 'application/json' }
           expect(response).to have_http_status(:ok)
@@ -39,7 +39,7 @@ RSpec.describe 'MemosController' do
     end
 
     context '存在しないメモを取得しようとした場合' do
-      it '404が返ることを確認する' do
+      it '404が返る' do
         get '/memos/0'
         expect(response).to have_http_status(:not_found)
         assert_response_schema_confirm(404)
@@ -76,7 +76,7 @@ RSpec.describe 'MemosController' do
         { title: '', content: '', tag_ids: tag_ids }
       end
 
-      it '422になり、エラーメッセージがレスポンスとして返る' do
+      it '422になり、エラーメッセージが返る' do
         aggregate_failures do
           expect do
             expect do
@@ -117,7 +117,7 @@ RSpec.describe 'MemosController' do
     context 'バリデーションエラーになる場合' do
       let(:params) { { content: '', tag_ids: [existing_tags.last.id + 100] } }
 
-      it '422になり、エラーメッセージがレスポンスとして返る' do
+      it '422になり、エラーメッセージが返る' do
         aggregate_failures do
           put "/memos/#{existing_memo.id}", params: { memo_form: params }, as: :json
           assert_request_schema_confirm
@@ -149,7 +149,7 @@ RSpec.describe 'MemosController' do
     context 'メモを削除しようとした場合' do
       let!(:existing_memo) { create(:memo) }
 
-      it 'メモを削除されたことを確認する' do
+      it 'メモを削除され、204が返る' do
         aggregate_failures do
           expect { delete "/memos/#{existing_memo.id}" }.to change(Memo, :count).by(-1)
           assert_request_schema_confirm
@@ -160,7 +160,7 @@ RSpec.describe 'MemosController' do
     end
 
     context '存在しないメモを削除しようとした場合' do
-      it '404が返ることを確認する' do
+      it '404が返る' do
         aggregate_failures do
           expect { delete '/memos/0' }.not_to change(Memo, :count)
           assert_request_schema_confirm
