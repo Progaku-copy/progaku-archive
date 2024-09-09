@@ -36,3 +36,8 @@ Style/HashSyntax:
 
 RSpec/ExampleLength:
   Enabled: false
+
+# SymbolArrayのStyleを%記法に統一
+Style/SymbolArray:
+  EnforcedStyle: percent
+  MinSize: 2
