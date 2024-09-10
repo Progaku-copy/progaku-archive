@@ -29,7 +29,7 @@ RSpec.describe Tag do
     context 'タグ名が空文字の場合' do
       let(:tag) { build(:tag, name: '') }
 
-      it '無効な状態であり、エラーメッセージが「タグ名を入力してください」となっていること' do
+      it '無効な状態であり、エラーメッセージが「タグ名を入力してください」となっていること' do # rubocop:disable RSpec/MultipleExpectations
         expect(tag).not_to be_valid
         expect(tag.errors.full_messages).to eq ['タグ名を入力してください']
       end
@@ -38,7 +38,7 @@ RSpec.describe Tag do
     context 'タグ名が31文字以上の場合' do
       let(:tag) { build(:tag, name: 'a' * 31) }
 
-      it '無効な状態であり、エラーメッセージが「タグ名は30文字以内で入力してください」となっていること' do
+      it '無効な状態であり、エラーメッセージが「タグ名は30文字以内で入力してください」となっていること' do # rubocop:disable RSpec/MultipleExpectations
         expect(tag).not_to be_valid
         expect(tag.errors.full_messages).to eq ['タグ名は30文字以内で入力してください']
       end
@@ -48,7 +48,7 @@ RSpec.describe Tag do
       let(:tag) { create(:tag) }
       let(:duplicate_tag) { build(:tag, name: tag.name) }
 
-      it '無効な状態であり、エラーメッセージが「タグ名はすでに存在します」となっていること' do
+      it '無効な状態であり、エラーメッセージが「タグ名はすでに存在します」となっていること' do # rubocop:disable RSpec/MultipleExpectations
         expect(duplicate_tag).not_to be_valid
         expect(duplicate_tag.errors.full_messages).to eq ['タグ名はすでに存在します']
       end
@@ -57,7 +57,7 @@ RSpec.describe Tag do
     context 'タグの順番がない場合' do
       let(:tag) { build(:tag, priority: nil) }
 
-      it '無効な状態であり、エラーメッセージが「タグの順番を入力してください」となっていること' do
+      it '無効な状態であり、エラーメッセージが「タグの順番を入力してください」となっていること' do # rubocop:disable RSpec/MultipleExpectations
         expect(tag).not_to be_valid
         expect(tag.errors.full_messages).to eq ['タグの順番を入力してください']
       end
