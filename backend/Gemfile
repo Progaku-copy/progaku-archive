@@ -62,6 +62,10 @@ group :development, :test do
   gem "rubocop-rails", require: false
   # Github: https://github.com/rubocop/rubocop-rspec
   gem "rubocop-rspec", require: false
+
+  # カバレッジ出力のフォーマット
+  # https://github.com/wbailey/command_line_reporter
+  gem 'command_line_reporter'
 end
 
 group :development do
