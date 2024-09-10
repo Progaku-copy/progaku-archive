@@ -33,11 +33,11 @@ RSpec.describe 'Tags' do
 
   describe 'POST /tags' do
     context 'タグ名が有効な場合' do
-      let(:valid_tag_params) { { name: 'New Tag', priority: 4 } }
+      let(:params) { { name: 'New Tag', priority: 4 } }
 
       it 'tagレコードが追加され、204になる' do
         aggregate_failures do
-          expect { post '/tags', params: { tag: valid_tag_params }, as: :json }.to change(Tag, :count).by(+1)
+          expect { post '/tags', params: { tag: params }, as: :json }.to change(Tag, :count).by(+1)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -47,11 +47,11 @@ RSpec.describe 'Tags' do
     end
 
     context 'バリデーションエラーになる場合' do
-      let(:invalid_tag_params) { { name: '' } }
+      let(:params) { { name: '' } }
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          expect { post '/tags', params: { tag: invalid_tag_params }, as: :json }.not_to change(Tag, :count)
+          expect { post '/tags', params: { tag: params }, as: :json }.not_to change(Tag, :count)
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_entity)
           assert_response_schema_confirm(422)
@@ -63,11 +63,11 @@ RSpec.describe 'Tags' do
 
   describe 'PUT /tags/:id' do
     context 'タグ名及びタグの順番が有効な場合' do
-      let(:valid_tag_params) { { name: 'Update Tag', priority: 5 } }
+      let(:params) { { name: 'Update Tag', priority: 5 } }
 
       it 'タグが更新され、204になる' do
         aggregate_failures do
-          put "/tags/#{tags[1].id}", params: { tag: valid_tag_params }, as: :json
+          put "/tags/#{tags[1].id}", params: { tag: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -77,11 +77,11 @@ RSpec.describe 'Tags' do
     end
 
     context 'バリデーションエラーになる場合' do
-      let(:invalid_tag_params) { { name: '' } }
+      let(:params) { { name: '' } }
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          put "/tags/#{tags[1].id}", params: { tag: invalid_tag_params }, as: :json
+          put "/tags/#{tags[1].id}", params: { tag: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_entity)
           assert_response_schema_confirm(422)
