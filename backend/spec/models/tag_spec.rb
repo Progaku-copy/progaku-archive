@@ -73,14 +73,12 @@ RSpec.describe Tag do
   end
 
   describe 'アソシエーションのテスト' do
-    it 'Memoモデルとの関連がhas_manyであること' do
-      tag = described_class.reflect_on_association(:memos)
-      expect(tag.macro).to eq :has_many
-    end
-
-    it 'MemoTagモデルを介していること' do
+    it 'Memoモデルとの関連がhas_manyであり、MemoTagモデルを介していること' do
+      aggregate_failures do
       tag = described_class.reflect_on_association(:memos)
       expect(tag.through_reflection.name).to eq :memo_tags
+      expect(tag.macro).to eq :has_many
+      end
     end
   end
 end
