@@ -8,9 +8,15 @@ servers:
 tags:
   - name: メモ
     description: メモに関するAPI
+  - name: タグ
+    description: タグに関するAPI
 
 paths:
   /memos:
     $ref: './paths/memo.yml#/paths/~1memos'
   /memos/{memoId}:
     $ref: './paths/memoId.yml#/paths/~1memos~1{memoId}'
+  /tags:
+    $ref: './paths/tag.yml#/paths/~1tags'
+  /tags/{tagId}:
+    $ref: './paths/tagId.yml#/paths/~1tags~1{tagId}'
