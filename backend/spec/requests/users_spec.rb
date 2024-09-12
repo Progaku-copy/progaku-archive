@@ -25,7 +25,7 @@ RSpec.describe 'UsersController' do
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq('アカウント名を入力してください、アカウント名は6文字以上で入力してください')
         end
       end
@@ -39,7 +39,7 @@ RSpec.describe 'UsersController' do
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq('パスワードを入力してください、パスワードを入力してください、パスワードは10文字以上で入力してください')
         end
       end
@@ -53,7 +53,7 @@ RSpec.describe 'UsersController' do
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq('アカウント名はすでに存在します')
         end
       end

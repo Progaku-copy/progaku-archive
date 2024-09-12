@@ -53,7 +53,7 @@ RSpec.describe 'Tags' do
         aggregate_failures do
           expect { post '/tags', params: { tag: params }, as: :json }.not_to change(Tag, :count)
           assert_request_schema_confirm
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
           expect(response.parsed_body['errors']).to eq(%w[タグ名を入力してください タグの順番を入力してください])
         end
@@ -142,7 +142,7 @@ RSpec.describe 'Tags' do
         aggregate_failures do
           expect { delete "/tags/#{tag.id}", as: :json }.not_to change(Tag, :count)
           assert_request_schema_confirm
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
         end
       end
