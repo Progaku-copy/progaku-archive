@@ -5,15 +5,12 @@ class SessionsController < ApplicationController
 
   def create
     user = User.find_by(account_name: session_params[:account_name])
-    return render json: { errors: ['アカウント名が存在しません'] }, status: :unauthorized unless user
-
-    unless user.authenticate(session_params[:password])
-      return render json: { errors: ['パスワードが正しくありません'] },
-                    status: :unauthorized
+    if user&.authenticate(session_params[:password])
+      session[:user_id] = user.id
+      head :ok
+    else
+      render json: { message: 'アカウント名とパスワードの組み合わせが不正です' }, status: :unauthorized
     end
-
-    session[:user_id] = user.id
-    render json: { message: 'ログインしました。' }, status: :ok
   end
 
   def destroy
