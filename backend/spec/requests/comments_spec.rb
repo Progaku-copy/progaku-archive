@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'CommentsController' do
-  let!(:user) { create(:user, password: 'password') }
+  let!(:user) { create(:user) }
 
   describe 'POST /memos/:memo_id/comments' do
     context 'ログイン中かつコンテンツが有効な場合' do

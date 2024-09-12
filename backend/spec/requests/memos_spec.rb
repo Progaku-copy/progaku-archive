@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'MemosController' do
-  let!(:user) { create(:user, password: 'password') }
+  let!(:user) { create(:user) }
 
   describe 'GET /memos' do
     let!(:memos) { create_list(:memo, 3) }

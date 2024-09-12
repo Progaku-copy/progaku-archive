@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'UsersController' do
-  let(:user) { create(:user, password: 'password', admin: true) }
+  let(:user) { create(:user, admin: true) }
 
   describe 'POST /admin/users' do
     context '管理ユーザでログイン中かつアカウント名とパスワードが有効な場合' do
@@ -26,13 +26,13 @@ RSpec.describe 'UsersController' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
-          expect(response.parsed_body['errors']).to include('アカウント名を入力してください')
+          expect(response.parsed_body['message']).to eq('アカウント名を入力してください、アカウント名は6文字以上で入力してください')
         end
       end
     end
 
     context '管理ユーザでログイン中かつパスワードが無効な場合' do
-      let(:params) { { account_name: 'testUser', password: '' } }
+      let(:params) { { account_name: 'test_user', password: '' } }
 
       before { sign_in(user) }
 
