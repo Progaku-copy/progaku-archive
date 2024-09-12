@@ -17,7 +17,7 @@
 #
 FactoryBot.define do
   factory :user do
-    account_name { 'test_user' }
-    password { 'password' }
+    sequence(:account_name) { "User-#{_1}" }
+    password { 'password_password' }
   end
 end

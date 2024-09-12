@@ -92,19 +92,20 @@ RSpec.describe User do
     end
   end
 
-  context "password が6文字未満の場合" do
-    before { user.password = Faker::Lorem.characters(number: 5) }
+    context "password が10文字未満の場合" do
+      before { user.password = Faker::Lorem.characters(number: 9) }
 
-    it "valid?メソッドがfalseを返す" do
-      expect(user).not_to be_valid
+      it "valid?メソッドがfalseを返す" do
+        expect(user).not_to be_valid
+      end
     end
-  end
 
-  context "password が13文字以上の場合" do
-    before { user.password = Faker::Lorem.characters(number: 13) }
+    context "password が64文字以上の場合" do
+      before { user.password = Faker::Lorem.characters(number: 65) }
 
-    it "valid?メソッドがfalseを返す" do
-      expect(user).not_to be_valid
+      it "valid?メソッドがfalseを返す" do
+        expect(user).not_to be_valid
+      end
     end
   end
 end

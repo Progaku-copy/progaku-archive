@@ -16,9 +16,5 @@
 class User < ApplicationRecord
   has_secure_password
   validates :account_name, presence: true, uniqueness: true, length: { minimum: 6, maximum: 30 }
-  validates :password, presence: true, length: { minimum: 6, maximum: 12 }
-
-  def admin?
-    admin == true
-  end
+  validates :password, presence: true, length: { minimum: 10, maximum: 64 }
 end
