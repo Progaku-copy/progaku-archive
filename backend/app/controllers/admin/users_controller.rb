@@ -2,7 +2,7 @@
 
 module Admin
   class UsersController < ApplicationController
-    before_action :check_admin
+    before_action :authorize_admin!, only: %i[create]
 
     def create
       user = User.new(user_params)
@@ -19,7 +19,7 @@ module Admin
       params.require(:user).permit(:account_name, :password, :password_confirmation)
     end
 
-    def check_admin
+    def authorize_admin!
       render_forbidden_error('権限がありません') unless current_user.admin?
     end
   end
