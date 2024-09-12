@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  skip_before_action :authenticate_user!
+  skip_before_action :authenticate_user!, only: %i[create]
+
   def create
     user = User.find_by(account_name: session_params[:account_name])
     return render json: { errors: ['アカウント名が存在しません'] }, status: :unauthorized unless user
