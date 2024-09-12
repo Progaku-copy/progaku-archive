@@ -19,7 +19,7 @@ module Admin
     end
 
     def check_admin
-      head :forbidden unless current_user&.admin?
+      render json: { message: '権限がありません' }, status: :forbidden unless current_user.admin?
     end
   end
 end

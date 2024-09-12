@@ -17,7 +17,7 @@ class SessionsController < ApplicationController
 
   def destroy
     reset_session
-    head :no_content
+    render json: { message: 'ログアウトしました' }, status: :ok
   end
 
   private
