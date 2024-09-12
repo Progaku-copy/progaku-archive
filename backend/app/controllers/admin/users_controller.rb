@@ -3,12 +3,13 @@
 module Admin
   class UsersController < ApplicationController
     before_action :check_admin
+
     def create
       user = User.new(user_params)
       if user.save
         head :no_content
       else
-        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+        render json: { message: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
       end
     end
 
