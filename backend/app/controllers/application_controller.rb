@@ -10,10 +10,18 @@ class ApplicationController < ActionController::API
   end
 
   def authenticate_user!
-    render json: { message: 'ログインしてください' }, status: :unauthorized unless current_user
+    render_unauthorized_error('ログインしてください') unless current_user
   end
 
   def record_not_found(exception)
     render json: { error: exception.message }, status: :not_found
+  end
+
+  def render_unauthorized_error(message)
+    render json: { message: message }, status: :unauthorized
+  end
+
+  def render_forbidden_error(message)
+    render json: { message: message }, status: :forbidden
   end
 end
