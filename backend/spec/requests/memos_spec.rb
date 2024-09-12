@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe 'MemosController' do
+  let!(:user) { create(:user) }
+
   describe 'GET /memos' do
-    context 'メモが存在する場合' do
-      let!(:memos) { create_list(:memo, 3) }
+    let!(:memos) { create_list(:memo, 3) }
+
+    context 'ログイン中かつメモが存在する場合' do
+      before { sign_in(user) }
 
       it '全てのメモが降順で返る' do
         aggregate_failures do
@@ -17,12 +21,21 @@ RSpec.describe 'MemosController' do
         end
       end
     end
+
+    context 'ログインしていない場合' do
+      it '401が返る' do
+        get '/memos'
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe 'GET /memos/:id' do
-    context 'メモが存在する場合' do
-      let!(:memo) { create(:memo) }
-      let!(:comments) { create_list(:comment, 3, memo: memo) }
+    let!(:memo) { create(:memo) }
+    let!(:comments) { create_list(:comment, 3, memo: memo) }
+
+    context 'ログイン中かつメモが存在する場合' do
+      before { sign_in(user) }
 
       it '指定したメモ、コメントが返る' do
         aggregate_failures do
@@ -38,20 +51,31 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context '存在しないメモを取得しようとした場合' do
+    context 'ログイン中かつ存在しないメモを取得しようとした場合' do
+      before { sign_in(user) }
+
       it '404が返る' do
         get '/memos/0'
         expect(response).to have_http_status(:not_found)
         assert_response_schema_confirm(404)
       end
     end
+
+    context 'ログインしていない場合' do
+      it '401が返る' do
+        get "/memos/#{memo.id}"
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe 'POST /memos' do
-    context 'タイトルとコンテンツが有効な場合' do
+    context 'ログイン中かつタイトルとコンテンツが有効な場合' do
       let(:valid_memo_params) do
         { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5) }
       end
+
+      before { sign_in(user) }
 
       it 'memoレコードが追加され、204が返る' do
         aggregate_failures do
@@ -64,8 +88,10 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context 'バリデーションエラーになる場合' do
+    context 'ログインしていてバリデーションエラーになる場合' do
       let(:empty_memo_params) { { title: '', content: '' } }
+
+      before { sign_in(user) }
 
       it '422になり、エラーメッセージが返る' do
         aggregate_failures do
@@ -77,12 +103,21 @@ RSpec.describe 'MemosController' do
         end
       end
     end
+
+    context 'ログインしていない場合' do
+      it '401が返る' do
+        post '/memos'
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 
   describe 'PUT /memos/:id' do
-    context 'コンテンツが有効な場合' do
+    context 'ログインしていてコンテンツが有効な場合' do
       let(:existing_memo) { create(:memo) }
       let(:params) { { content: '新しいコンテンツ' } }
+
+      before { sign_in(user) }
 
       it 'memoが更新され、204になる' do
         aggregate_failures do
@@ -96,9 +131,11 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context 'バリデーションエラーになる場合' do
+    context 'ログイン中かつバリデーションエラーになる場合' do
       let(:existing_memo) { create(:memo) }
       let(:params) { { content: '' } }
+
+      before { sign_in(user) }
 
       it '422になり、エラーメッセージが返る' do
         aggregate_failures do
@@ -113,9 +150,11 @@ RSpec.describe 'MemosController' do
     end
   end
 
-  context 'タイトルを更新しようとした場合' do
+  context 'ログイン中かつタイトルを更新しようとした場合' do
     let(:existing_memo) { create(:memo) }
     let(:params) { { title: '新しいタイトル' } }
+
+    before { sign_in(user) }
 
     it 'タイトルが変更されず204が返る' do
       aggregate_failures do
@@ -129,9 +168,18 @@ RSpec.describe 'MemosController' do
     end
   end
 
+  context 'ログインしていない場合' do
+    it '401が返る' do
+      put '/memos/0'
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
   describe 'DELETE /memos/:id' do
-    context 'メモを削除しようとした場合' do
+    context 'ログイン中かつメモを削除しようとした場合' do
       let!(:existing_memo) { create(:memo) }
+
+      before { sign_in(user) }
 
       it 'メモを削除され、204が返る' do
         aggregate_failures do
@@ -143,7 +191,9 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context '存在しないメモを削除しようとした場合' do
+    context 'ログイン中かつ存在しないメモを削除しようとした場合' do
+      before { sign_in(user) }
+
       it '404が返る' do
         aggregate_failures do
           expect { delete '/memos/0' }.not_to change(Memo, :count)
@@ -151,6 +201,13 @@ RSpec.describe 'MemosController' do
           expect(response).to have_http_status(:not_found)
           assert_response_schema_confirm(404)
         end
+      end
+    end
+
+    context 'ログインしていない場合' do
+      it '401が返る' do
+        delete '/memos/0'
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end
