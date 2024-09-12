@@ -33,7 +33,7 @@ RSpec.describe 'CommentsController' do
           expect do
             post "/memos/#{memo.id}/comments", params: { comment: params }, as: :json
           end.not_to change(Comment, :count)
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['errors']).to eq(['内容を入力してください'])
         end
       end
@@ -75,7 +75,7 @@ RSpec.describe 'CommentsController' do
     it 'コメントが更新されず、422が返る' do
       aggregate_failures do
         put "/memos/#{memo.id}/comments/#{comment.id}", params: { comment: params }, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body['errors']).to eq(['内容を入力してください'])
       end
     end
@@ -181,7 +181,7 @@ RSpec.describe 'CommentsController' do
           expect do
             delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
           end.not_to change(Comment, :count)
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end
