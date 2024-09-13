@@ -13,10 +13,96 @@ tags:
 
 paths:
   /memos:
-    $ref: './paths/memo.yml#/paths/~1memos'
+    $ref: "./paths/memo.yml#/paths/~1memos"
   /memos/{memoId}:
-    $ref: './paths/memoId.yml#/paths/~1memos~1{memoId}'
+    $ref: "./paths/memoId.yml#/paths/~1memos~1{memoId}"
+  /memos/{memoId}/comments:
+    $ref: "./paths/comment.yml#/paths/~1memos~1{memoId}~1comments"
+  /memos/{memoId}/comments/{commentId}:
+    $ref: "./paths/commentId.yml#/paths/~1memos~1{memoId}~1comments~1{commentId}"
   /tags:
-    $ref: './paths/tag.yml#/paths/~1tags'
+    $ref: "./paths/tag.yml#/paths/~1tags"
   /tags/{tagId}:
-    $ref: './paths/tagId.yml#/paths/~1tags~1{tagId}'
+    $ref: "./paths/tagId.yml#/paths/~1tags~1{tagId}"
+  /login:
+    $ref: "./paths/session.yml#/paths/~1login"
+  /logout:
+    $ref: "./paths/session.yml#/paths/~1logout"
+  /admin/users:
+    $ref: "./paths/user.yml#/paths/~1admin~1users"
+
+components:
+  schemas:
+    memo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          example: メモのタイトル
+        content:
+          type: string
+          example: メモの内容
+        created_at:
+          type: string
+          format: date-time
+          example: 2021-01-01T00:00:00.000Z
+        updated_at:
+          type: string
+          format: date-time
+          example: 2021-01-01T00:00:00.000Z
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/comment"
+      required:
+        - id
+        - title
+        - content
+      additionalProperties: false
+    comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        memo_id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: コメントの内容
+        created_at:
+          type: string
+          format: date-time
+          example: 2021-01-01T00:00:00.000Z
+      required:
+        - memo_id
+        - content
+        - created_at
+      additionalProperties: false
+    tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "タグの名前"
+        priority:
+          type: integer
+          example: 1
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: _progaku_archive_session
+
+security:
+  - cookieAuth: []

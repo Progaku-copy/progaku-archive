@@ -5,14 +5,14 @@ paths:
         - タグ
       summary: タグ一覧取得
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '../components/tagSchema.yml#/components/schemas/tag'
+                  $ref: "../openapi.yml#/components/schemas/tag"
     post:
       tags:
         - タグ
@@ -31,9 +31,9 @@ paths:
                   type: integer
                   example: 1
       responses:
-        '204' :
+        "204":
           description: No Content
-        '422':
+        "422":
           description: Unprocessable Entity
           content:
             application/json:
