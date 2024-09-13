@@ -1,0 +1,38 @@
+paths:
+  /memos/{memoId}/comments:
+    post:
+      tags:
+        - コメント
+      summary: コメント作成
+      parameters:
+        - name: memoId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: メモID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: コメントの内容
+      responses:
+        '204':
+          description: No Content
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: "内容を入力してください"

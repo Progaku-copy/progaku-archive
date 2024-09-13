@@ -15,9 +15,10 @@ RSpec.describe 'CommentsController' do
           expect do
             post "/memos/#{memo.id}/comments", params: { comment: params }, as: :json
           end.to change(Comment, :count).by(1)
-
+          assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           expect(response.body).to be_empty
+          assert_response_schema_confirm(204)
         end
       end
     end
@@ -33,8 +34,10 @@ RSpec.describe 'CommentsController' do
           expect do
             post "/memos/#{memo.id}/comments", params: { comment: params }, as: :json
           end.not_to change(Comment, :count)
+          assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['errors']).to eq(['内容を入力してください'])
+          assert_response_schema_confirm(422)
         end
       end
     end
@@ -58,8 +61,10 @@ RSpec.describe 'CommentsController' do
       it 'コメントが更新され、204が返る' do
         aggregate_failures do
           put "/memos/#{memo.id}/comments/#{comment.id}", params: { comment: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           expect(response.body).to be_empty
+          assert_response_schema_confirm(204)
         end
       end
     end
@@ -75,8 +80,10 @@ RSpec.describe 'CommentsController' do
     it 'コメントが更新されず、422が返る' do
       aggregate_failures do
         put "/memos/#{memo.id}/comments/#{comment.id}", params: { comment: params }, as: :json
+        assert_request_schema_confirm
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body['errors']).to eq(['内容を入力してください'])
+        assert_response_schema_confirm(422)
       end
     end
   end
@@ -91,7 +98,9 @@ RSpec.describe 'CommentsController' do
     it '404が返る' do
       aggregate_failures do
         put "/memos/#{memo.id}/comments/0", params: { comment: params }, as: :json
+        assert_request_schema_confirm
         expect(response).to have_http_status(:not_found)
+        assert_response_schema_confirm(404)
       end
     end
   end
@@ -106,7 +115,9 @@ RSpec.describe 'CommentsController' do
     it '404が返る' do
       aggregate_failures do
         put "/memos/0/comments/#{comment.id}", params: { comment: params }, as: :json
+        assert_request_schema_confirm
         expect(response).to have_http_status(:not_found)
+        assert_response_schema_confirm(404)
       end
     end
   end
@@ -130,7 +141,9 @@ RSpec.describe 'CommentsController' do
           expect do
             delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
           end.to change(Comment, :count).by(-1)
+          assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
+          assert_response_schema_confirm(204)
         end
       end
     end
@@ -145,7 +158,9 @@ RSpec.describe 'CommentsController' do
           expect do
             delete "/memos/#{memo.id}/comments/0", as: :json
           end.not_to change(Comment, :count)
+          assert_request_schema_confirm
           expect(response).to have_http_status(:not_found)
+          assert_response_schema_confirm(404)
         end
       end
     end
@@ -161,7 +176,9 @@ RSpec.describe 'CommentsController' do
           expect do
             delete "/memos/0/comments/#{comment.id}", as: :json
           end.not_to change(Comment, :count)
+          assert_request_schema_confirm
           expect(response).to have_http_status(:not_found)
+          assert_response_schema_confirm(404)
         end
       end
     end
@@ -181,7 +198,9 @@ RSpec.describe 'CommentsController' do
           expect do
             delete "/memos/#{memo.id}/comments/#{comment.id}", as: :json
           end.not_to change(Comment, :count)
+          assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
+          assert_response_schema_confirm(422)
         end
       end
     end
