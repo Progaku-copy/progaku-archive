@@ -12,7 +12,9 @@ RSpec.describe 'UsersController' do
       it 'ユーザが作成され、204が返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
+          assert_response_schema_confirm(204)
         end
       end
     end
@@ -25,8 +27,10 @@ RSpec.describe 'UsersController' do
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq('アカウント名を入力してください、アカウント名は6文字以上で入力してください')
+          assert_response_schema_confirm(422)
         end
       end
     end
@@ -39,8 +43,10 @@ RSpec.describe 'UsersController' do
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq('パスワードを入力してください、パスワードを入力してください、パスワードは10文字以上で入力してください')
+          assert_response_schema_confirm(422)
         end
       end
     end
@@ -53,8 +59,10 @@ RSpec.describe 'UsersController' do
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq('アカウント名はすでに存在します')
+          assert_response_schema_confirm(422)
         end
       end
     end
@@ -67,8 +75,10 @@ RSpec.describe 'UsersController' do
       it '403が返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:forbidden)
           expect(response.parsed_body['message']).to eq('権限がありません')
+          assert_response_schema_confirm(403)
         end
       end
     end
@@ -79,7 +89,9 @@ RSpec.describe 'UsersController' do
       it '401が返る' do
         aggregate_failures do
           post '/admin/users', params: { user: params }, as: :json
+          assert_request_schema_confirm
           expect(response).to have_http_status(:unauthorized)
+          assert_response_schema_confirm(401)
         end
       end
     end

@@ -1,0 +1,96 @@
+paths:
+  /memos/{memoId}/comments/{commentId}:
+    put:
+      tags:
+        - コメント
+      summary: コメント更新
+      parameters:
+        - name: memoId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: メモID
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: コメントID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: 更新されたコメントの内容
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "コメントが見つかりません"
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: "内容を入力してください"
+    delete:
+      tags:
+        - コメント
+      summary: コメント削除
+      parameters:
+        - name: memoId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: メモID
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: コメントID
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "コメントが見つかりません"
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                      example: "コメントの削除に失敗しました"

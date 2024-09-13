@@ -1,0 +1,62 @@
+paths:
+  /admin/users:
+    post:
+      tags:
+        - ユーザー
+      summary: ユーザー作成
+      description: 管理者ユーザーのみが新しいユーザーを作成できます(User.adminがtrue)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    account_name:
+                      type: string
+                      description: 作成するユーザーのアカウント名
+                      example: test_user
+                    password:
+                      type: string
+                      description: 作成するユーザーのパスワード
+                      example: password_password
+                    password_confirmation:
+                      type: string
+                      description: 確認用パスワード
+                      example: password_password
+      responses:
+        '204':
+          description: ユーザー作成に成功した場合
+        '401':
+          description: ログインしていないユーザーがアクセスした場合
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ログインしてください"
+        '403':
+          description: 管理者権限がないユーザーがアクセスした場合
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "権限がありません"
+        '422':
+          description: バリデーションエラーが発生した場合
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "アカウント名はすでに存在します"

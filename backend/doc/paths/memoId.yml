@@ -20,7 +20,7 @@ paths:
                 type: object
                 properties:
                   memo:
-                    $ref: '../components/memoSchema.yml#/components/schemas/memo'
+                    $ref: '../openapi.yml#/components/schemas/memo'
         '404':
           description: Not Found
           content:
