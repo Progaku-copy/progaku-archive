@@ -3,8 +3,13 @@
 class MemosController < ApplicationController
   # GET /memos
   def index
-    memos = Memo::Query.resolve(memos: Memo.all, params: params)
-    render json: { memos: memos }, status: :ok
+    memos, total_count, total_page, current_page = Memo::Query.call(filter_collection: Memo.all, params: params)
+    render json: { memos: memos,
+                   total_count: total_count,
+                   total_page: total_page,
+                   current_page: current_page }, status: :ok
+  rescue TypeError
+    render json: { error: 'ページパラメータが無効です' }, status: :bad_request
   end
 
   # GET /memos/:id
