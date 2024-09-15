@@ -43,6 +43,7 @@ class Memo < ApplicationRecord
     end
 
     module TitleFilter
+      # params[:title] に値が存在する場合、タイトルに部分一致するメモを返す
       def self.resolve(scope:, params:)
         return scope if params[:title].blank?
 
@@ -52,6 +53,7 @@ class Memo < ApplicationRecord
     private_constant :TitleFilter
 
     module ContentFilter
+      # params[:content] に値が存在する場合、本文に部分一致するメモを返す
       def self.resolve(scope:, params:)
         return scope if params[:content].blank?
 
@@ -64,6 +66,7 @@ class Memo < ApplicationRecord
       DEFAULT_ORDER = 'desc'
       private_constant :DEFAULT_ORDER
 
+      # params[:order] に値が存在する場合、指定された順序でメモを返す
       def self.resolve(scope:, params:)
         scope.order(id: params[:order].presence || DEFAULT_ORDER)
       end
