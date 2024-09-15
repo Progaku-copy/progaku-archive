@@ -4,6 +4,14 @@ paths:
       tags:
         - メモ
       summary: メモ一覧取得
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+            example: 1
       responses:
         '200':
           description: OK
@@ -16,6 +24,25 @@ paths:
                     type: array
                     items:
                       $ref: '../components/memoSchema.yml#/components/schemas/memo'
+                  total_count:
+                    type: integer
+                    example: 1
+                  total_pages:
+                    type: integer
+                    example: 1
+                  current_page:
+                    type: integer
+                    example: 1
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "ページパラメータが無効です"
     post:
       tags:
         - メモ
