@@ -4,17 +4,18 @@
 #
 # Table name: memos
 #
-#  id                    :bigint           not null, primary key
-#  content(メモの本文)   :text(65535)      not null
-#  title(メモのタイトル) :string(255)      not null
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
+#  id                           :bigint           not null, primary key
+#  content(メモの本文)          :text(65535)      not null
+#  title(メモのタイトル)        :string(255)      not null
+#  user_name(Slackのユーザー名) :string(21)       not null
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
 #
 RSpec.describe Memo do
   subject(:memo) { build(:memo) }
 
   describe 'バリデーションのテスト' do
-    context 'title と content が有効な場合' do
+    context 'title と content と user_name が有効な場合' do
       it 'valid?メソッドがtrueを返すこと' do
         expect(memo).to be_valid
       end
@@ -69,6 +70,45 @@ RSpec.describe Memo do
       it 'errorsに「コンテンツを入力してください」と格納されること' do
         memo.valid?
         expect(memo.errors.full_messages).to eq ['コンテンツを入力してください']
+      end
+    end
+
+    context 'user_nameが空文字の場合' do
+      before { memo.user_name = '' }
+
+      it 'valid?メソッドがfalseを返すこと' do
+        expect(memo).not_to be_valid
+      end
+
+      it 'errorsに「ユーザー名を入力してください」と格納されること' do
+        memo.valid?
+        expect(memo.errors.full_messages).to eq ['ユーザ名を入力してください']
+      end
+    end
+
+    context 'user_nameがnilの場合' do
+      before { memo.user_name = nil }
+
+      it 'valid?メソッドがfalseを返すこと' do
+        expect(memo).not_to be_valid
+      end
+
+      it 'errorsに「ユーザ名を入力してください」と格納されること' do
+        memo.valid?
+        expect(memo.errors.full_messages).to eq ['ユーザ名を入力してください']
+      end
+    end
+
+    context 'user_nameが21文字以上の場合' do
+      before { memo.user_name = 'a' * 22 }
+
+      it 'valid?メソッドがfalseを返すこと' do
+        expect(memo).not_to be_valid
+      end
+
+      it 'errorsに「ユーザ名は21文字以内で入力してください」と格納されること' do
+        memo.valid?
+        expect(memo.errors.full_messages).to eq ['ユーザ名は21文字以内で入力してください']
       end
     end
   end

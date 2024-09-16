@@ -33,6 +33,9 @@ paths:
                 content:
                   type: string
                   example: メモの内容
+                user_name:
+                  type: string
+                  example: ユーザ名
       responses:
         '204' :
           description: No Content
