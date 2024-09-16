@@ -4,6 +4,7 @@ ja:
       memo:
         title: タイトル
         content: コンテンツ
+        user_name: ユーザ名
       comment:
         content: 内容
       user:

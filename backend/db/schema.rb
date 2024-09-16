@@ -32,6 +32,7 @@ ActiveRecord::Schema[7.2].define(version: 0) do
   create_table "memos", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "title", null: false, comment: "メモのタイトル"
     t.text "content", null: false, comment: "メモの本文"
+    t.string "user_name", limit: 21, null: false, comment: "Slackのユーザー名"
     t.timestamp "created_at", null: false
     t.timestamp "updated_at", null: false
   end
