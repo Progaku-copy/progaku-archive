@@ -4,27 +4,33 @@ class Memo
   class BuildForm
     include ActiveModel::Validations
 
-    validate :memo_valid?
+    validates :memo, cascade: true
+    validates :memo_tags, cascade: true
 
     def initialize(params:)
       @params = params
     end
 
     def save
-      return false unless valid?
-
-      resolve_memo_tags
+      return false if invalid?
 
       ActiveRecord::Base.transaction do
-        memo.save
+        save_record!(memo)
       end
 
-      true
+      errors.empty?
     end
 
     private
 
     attr_reader :params
+
+    def save_record!(record)
+      return true if record.save
+
+      errors.add(:base, record.error_message)
+      raise ActiveRecord::Rollback
+    end
 
     def memo
       @memo ||= Memo.new(
@@ -33,15 +39,18 @@ class Memo
       )
     end
 
-    def memo_valid?
-      return if memo.valid? # rubocop:disable Style/ReturnNilInPredicateMethodDefinition
+    def memo_tags
+      return if memo.nil?
 
-      memo.errors.each { |error| errors.add(:base, error.full_message) }
+      @memo_tags ||= build_memo_tags
     end
 
-    def resolve_memo_tags
-      tags = Tag.where(id: params[:tag_ids])
-      tags.each do |tag|
+    def tags
+      Tag.where(id: params[:tag_ids])
+    end
+
+    def build_memo_tags
+      tags.map do |tag|
         memo.memo_tags.build(tag: tag)
       end
     end
