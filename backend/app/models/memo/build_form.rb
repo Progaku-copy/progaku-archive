@@ -35,7 +35,8 @@ class Memo
     def memo
       @memo ||= Memo.new(
         title: params[:title],
-        content: params[:content]
+        content: params[:content],
+        poster: params[:poster]
       )
     end
 

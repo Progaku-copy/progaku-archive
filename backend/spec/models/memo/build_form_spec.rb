@@ -6,7 +6,7 @@ RSpec.describe Memo::BuildForm do
 
   describe '#バリデーション' do
     context 'フォーム入力値が有効な場合' do
-      let(:params) { { title: 'Test Memo', content: 'This is a test memo', tag_ids: } }
+      let(:params) { { title: 'Test Memo', content: 'This is a test memo', poster: 'Test User', tag_ids: } }
       let(:form) { described_class.new(params:) }
 
       it 'フォームが有効な状態であること' do
@@ -29,7 +29,7 @@ RSpec.describe Memo::BuildForm do
 
   describe '#save' do
     context 'フォームの値が有効な場合' do
-      let(:params) { { title: 'Test Memo', content: 'This is a test memo', tag_ids: } }
+      let(:params) { { title: 'Test Memo', content: 'This is a test memo', poster: 'Test User', tag_ids: } }
       let(:form) { described_class.new(params:) }
 
       it 'メモが新規作成され、タグが紐付けられ、trueが返されること' do
@@ -47,7 +47,7 @@ RSpec.describe Memo::BuildForm do
 
       it 'メモとメモタグが新規作成されず、falseが返されること' do
         aggregate_failures do
-          expect { form.save }.not_to change { [Memo.count, MemoTag.count] }
+          expect { form.save }.not_to(change { [Memo.count, MemoTag.count] })
           expect(form.save).to be_falsey
         end
       end
