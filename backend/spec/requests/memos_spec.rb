@@ -133,7 +133,7 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context 'ログイン中かつバリデーションエラーになる場合' do
+    context 'ログイン中かつコンテンツが空の場合' do
       let(:existing_memo) { create(:memo) }
       let(:params) { { content: '' } }
 
@@ -152,20 +152,38 @@ RSpec.describe 'MemosController' do
     end
   end
 
-  context 'ログイン中かつタイトルを更新しようとした場合' do
+  context 'ログイン中かつタイトルが有効な場合' do
     let(:existing_memo) { create(:memo) }
     let(:params) { { title: '新しいタイトル' } }
 
     before { sign_in(user) }
 
-    it 'タイトルが変更されず204が返る' do
+    it 'タイトルが更新され、204が返る' do
       aggregate_failures do
         put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
         assert_request_schema_confirm
         expect(response).to have_http_status(:no_content)
         existing_memo.reload
         assert_response_schema_confirm(204)
-        expect(existing_memo.title).not_to eq('新しいタイトル')
+        expect(existing_memo.title).to eq('新しいタイトル')
+      end
+    end
+  end
+
+  context 'ログイン中かつタイトルが無効な場合' do
+    let(:existing_memo) { create(:memo) }
+    let(:params) { { title: '' } }
+
+    before { sign_in(user) }
+
+    it '422が返り、エラーメッセージが返る' do
+      aggregate_failures do
+        put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+        assert_request_schema_confirm
+        existing_memo.reload
+        expect(response).to have_http_status(:unprocessable_content)
+        assert_response_schema_confirm(422)
+        expect(response.parsed_body['errors']).to eq(['タイトルを入力してください'])
       end
     end
   end

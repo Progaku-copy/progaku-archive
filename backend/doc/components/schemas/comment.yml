@@ -1,0 +1,23 @@
+comment:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      example: 1
+    memo_id:
+      type: integer
+      format: int64
+      example: 1
+    content:
+      type: string
+      example: コメントの内容
+    created_at:
+      type: string
+      format: date-time
+      example: 2021-01-01T00:00:00.000Z
+  required:
+    - memo_id
+    - content
+    - created_at
+  additionalProperties: false

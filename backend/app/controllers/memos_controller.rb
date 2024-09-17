@@ -28,7 +28,7 @@ class MemosController < ApplicationController
   def update
     memo = Memo.find(params[:id])
 
-    if memo.update(update_memo_params)
+    if memo.update(memo_params)
       head :no_content
     else
       render json: { errors: memo.errors.full_messages }, status: :unprocessable_entity
@@ -46,9 +46,5 @@ class MemosController < ApplicationController
 
   def memo_params
     params.require(:memo).permit(:title, :content, :poster)
-  end
-
-  def update_memo_params
-    params.require(:memo).permit(:content, :poster)
   end
 end

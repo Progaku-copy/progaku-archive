@@ -1,0 +1,33 @@
+memo:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      example: 1
+    title:
+      type: string
+      example: メモのタイトル
+    content:
+      type: string
+      example: メモの内容
+    poster:
+      type: string
+      example: Slackでの投稿者名
+    created_at:
+      type: string
+      format: date-time
+      example: 2021-01-01T00:00:00.000Z
+    updated_at:
+      type: string
+      format: date-time
+      example: 2021-01-01T00:00:00.000Z
+    comments:
+      type: array
+      items:
+        $ref: "./comment.yml#/comment"
+  required:
+    - id
+    - title
+    - content
+  additionalProperties: false
