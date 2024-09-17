@@ -22,24 +22,37 @@ class Memo < ApplicationRecord
     FIRST_PAGE = 1
     private_constant :FIRST_PAGE
 
-    # メモのフィルダリングとページネーションを行う
-    # @param filter_collection [ActiveRecord::Relation[Memo]]:メモのリスト
-    # @param params [ActionController::Parameters]: クエリパラメータ
-    # @return [Array] フィルタリングされたメモのリスト、メモの総数、ページ数、現在のページ番号
+    class << self
+      # メモのフィルダリングとページネーションを行う
+      # @param filter_collection [ActiveRecord::Relation[Memo]]:メモのリスト
+      # @param params [ActionController::Parameters]: クエリパラメータ
+      # @return [Array] フィルタリングされたメモのリスト、メモの総数、ページ数、現在のページ番号
+      def call(filter_collection:, params:)
+        memo_relation = \
+          filtered_memos(
+            filter_collection: filter_collection,
+            params: params
+          )
+        memo_count = memo_relation.count
+        { memos: PageFilter.resolve(scope: memo_relation, params: params),
+          total_page: memo_count.zero? ? FIRST_PAGE : (memo_count / PageFilter::MAX_ITEMS).ceil }
+      end
 
-    def self.call(filter_collection:, params:)
-      memo_relation = \
-        filtered_memos(
-          filter_collection: filter_collection,
-          params: params
-        )
-      count = memo_relation.count
-      [
-        PageFilter.resolve(scope: memo_relation, params: params),
-        count,
-        count.zero? ? FIRST_PAGE : (memo_relation.count / PageFilter::MAX_ITEMS).ceil,
-        page_number(params[:page])
-      ]
+      private
+
+      # 各フィルタを順次適用してメモをフィルタリングする
+      def filtered_memos(filter_collection:, params:)
+        FILTERS.reduce(filter_collection) do |scope, filter|
+          const_get(filter).resolve(scope: scope, params: params)
+        end
+      end
+
+      # ページ番号を取得する。ページ番号が指定されていない場合は最初のページを返す
+      def page_number(page)
+        return Integer(page) if page.present?
+
+        FIRST_PAGE
+      end
     end
 
     module TitleFilter
@@ -89,19 +102,6 @@ class Memo < ApplicationRecord
         end
       end
     end
-
-    # 各フィルタを順次適用してメモをフィルタリングする
-    def self.filtered_memos(filter_collection:, params:)
-      FILTERS.reduce(filter_collection) do |scope, filter|
-        const_get(filter).resolve(scope: scope, params: params)
-      end
-    end
-
-    # ページ番号を取得する。ページ番号が指定されていない場合は最初のページを返す
-    def self.page_number(page)
-      return Integer(page) if page.present?
-
-      FIRST_PAGE
-    end
+    private_constant :PageFilter
   end
 end

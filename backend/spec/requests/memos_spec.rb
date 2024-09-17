@@ -18,9 +18,7 @@ RSpec.describe 'MemosController' do
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
           expected_memo_ids = memos.reverse.map(&:id)
           expect(result_memo_ids).to eq(expected_memo_ids[0..9])
-          expect(response.parsed_body['current_page']).to eq(1)
           expect(response.parsed_body['total_page']).to eq(2)
-          expect(response.parsed_body['total_count']).to eq(20)
         end
       end
     end
@@ -37,9 +35,7 @@ RSpec.describe 'MemosController' do
           result_memo_ids = response.parsed_body['memos'].pluck('id')
           expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
           expect(result_memo_ids).to eq(expected_memo_ids)
-          expect(response.parsed_body['current_page']).to eq(2)
           expect(response.parsed_body['total_page']).to eq(2)
-          expect(response.parsed_body['total_count']).to eq(20)
         end
       end
     end
