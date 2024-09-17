@@ -29,26 +29,22 @@ RSpec.describe Tag do
     context 'タグ名が空文字の場合' do
       let(:tag) { build(:tag, name: '') }
 
-      it '無効な状態であること' do
-        expect(tag).not_to be_valid
-      end
-
-      it 'エラーメッセージが「タグ名を入力してください」となっていること' do
-        tag.valid?
-        expect(tag.errors.full_messages).to eq ['タグ名を入力してください']
+      it '無効な状態であり、エラーメッセージが「タグ名を入力してください」となっていること' do
+        aggregate_failures do
+          expect(tag).not_to be_valid
+          expect(tag.errors.full_messages).to eq ['タグ名を入力してください']
+        end
       end
     end
 
     context 'タグ名が31文字以上の場合' do
       let(:tag) { build(:tag, name: 'a' * 31) }
 
-      it '無効な状態であること' do
-        expect(tag).not_to be_valid
-      end
-
-      it 'エラーメッセージが「タグ名は30文字以内で入力してください」となっていること' do
-        tag.valid?
-        expect(tag.errors.full_messages).to eq ['タグ名は30文字以内で入力してください']
+      it '無効な状態であり、エラーメッセージが「タグ名は30文字以内で入力してください」となっていること' do
+        aggregate_failures do
+          expect(tag).not_to be_valid
+          expect(tag.errors.full_messages).to eq ['タグ名は30文字以内で入力してください']
+        end
       end
     end
 
@@ -56,34 +52,33 @@ RSpec.describe Tag do
       let(:tag) { create(:tag) }
       let(:duplicate_tag) { build(:tag, name: tag.name) }
 
-      it '無効な状態であること' do
-        expect(duplicate_tag).not_to be_valid
+      it '無効な状態であり、エラーメッセージが「タグ名はすでに存在します」となっていること' do
+        aggregate_failures do
+          expect(duplicate_tag).not_to be_valid
+          expect(duplicate_tag.errors.full_messages).to eq ['タグ名はすでに存在します']
+        end
       end
     end
 
     context 'タグの順番がない場合' do
       let(:tag) { build(:tag, priority: nil) }
 
-      it '無効な状態であること' do
-        expect(tag).not_to be_valid
-      end
-
-      it 'エラーメッセージが「タグの順番を入力してください」となっていること' do
-        tag.valid?
-        expect(tag.errors.full_messages).to eq ['タグの順番を入力してください']
+      it '無効な状態であり、エラーメッセージが「タグの順番を入力してください」となっていること' do
+        aggregate_failures do
+          expect(tag).not_to be_valid
+          expect(tag.errors.full_messages).to eq ['タグの順番を入力してください']
+        end
       end
     end
   end
 
   describe 'アソシエーションのテスト' do
-    it 'Memoモデルとの関連がhas_manyであること' do
-      tag = described_class.reflect_on_association(:memos)
-      expect(tag.macro).to eq :has_many
-    end
-
-    it 'MemoTagモデルを介していること' do
-      tag = described_class.reflect_on_association(:memos)
-      expect(tag.through_reflection.name).to eq :memo_tags
+    it 'Memoモデルとの関連がhas_manyであり、MemoTagモデルを介していること' do
+      aggregate_failures do
+        tag = described_class.reflect_on_association(:memos)
+        expect(tag.through_reflection.name).to eq :memo_tags
+        expect(tag.macro).to eq :has_many
+      end
     end
   end
 end

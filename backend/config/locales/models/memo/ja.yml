@@ -6,6 +6,9 @@ ja:
         content: コンテンツ
       comment:
         content: 内容
+      user:
+        account_name: アカウント名
+        password: パスワード
   errors:
     messages:
       blank: を入力してください

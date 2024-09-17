@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Tags' do
-  let!(:tags) do
-    (1..3).map do |index|
-      create(:tag, priority: index)
-    end.index_by(&:priority)
-  end
+  let!(:user) { create(:user) }
 
   describe 'GET /tags' do
+    let!(:tags) do
+      (1..3).map do |index|
+        create(:tag, priority: index)
+      end.index_by(&:priority)
+    end
+
+    before { sign_in(user) }
+
     it '全てのメモが取得でき昇順で並び変えられている' do
       aggregate_failures do
         get '/tags'
@@ -32,12 +36,14 @@ RSpec.describe 'Tags' do
   end
 
   describe 'POST /tags' do
-    context 'タグ名が有効な場合' do
-      let(:valid_tag_params) { { name: 'New Tag', priority: 4 } }
+    context 'ログイン中かつタグ名が有効な場合' do
+      let(:params) { { name: 'New Tag', priority: 4 } }
+
+      before { sign_in(user) }
 
       it 'tagレコードが追加され、204になる' do
         aggregate_failures do
-          expect { post '/tags', params: { tag: valid_tag_params }, as: :json }.to change(Tag, :count).by(+1)
+          expect { post '/tags', params: { tag: params }, as: :json }.to change(Tag, :count).by(+1)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -46,14 +52,16 @@ RSpec.describe 'Tags' do
       end
     end
 
-    context 'バリデーションエラーになる場合' do
-      let(:invalid_tag_params) { { name: '' } }
+    context 'ログイン中かつバリデーションエラーになる場合' do
+      let(:params) { { name: '' } }
+
+      before { sign_in(user) }
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          expect { post '/tags', params: { tag: invalid_tag_params }, as: :json }.not_to change(Tag, :count)
+          expect { post '/tags', params: { tag: params }, as: :json }.not_to change(Tag, :count)
           assert_request_schema_confirm
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
           expect(response.parsed_body['errors']).to eq(%w[タグ名を入力してください タグの順番を入力してください])
         end
@@ -62,12 +70,15 @@ RSpec.describe 'Tags' do
   end
 
   describe 'PUT /tags/:id' do
-    context 'タグ名及びタグの順番が有効な場合' do
-      let(:valid_tag_params) { { name: 'Update Tag', priority: 5 } }
+    context 'ログイン中かつタグ名及びタグの順番が有効な場合' do
+      let!(:tag) { create(:tag, priority: 4) }
+      let(:params) { { name: 'Update Tag', priority: 5 } }
+
+      before { sign_in(user) }
 
       it 'タグが更新され、204になる' do
         aggregate_failures do
-          put "/tags/#{tags[1].id}", params: { tag: valid_tag_params }, as: :json
+          put "/tags/#{tag.id}", params: { tag: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -76,21 +87,26 @@ RSpec.describe 'Tags' do
       end
     end
 
-    context 'バリデーションエラーになる場合' do
-      let(:invalid_tag_params) { { name: '' } }
+    context 'ログイン中かつバリデーションエラーになる場合' do
+      let!(:tag) { create(:tag, priority: 4) }
+      let(:params) { { name: '' } }
+
+      before { sign_in(user) }
 
       it '422になり、エラーメッセージがレスポンスとして返る' do
         aggregate_failures do
-          put "/tags/#{tags[1].id}", params: { tag: invalid_tag_params }, as: :json
+          put "/tags/#{tag.id}", params: { tag: params }, as: :json
           assert_request_schema_confirm
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
           expect(response.parsed_body['errors']).to eq(['タグ名を入力してください'])
         end
       end
     end
 
-    context '存在しないタグを更新しようとした場合' do
+    context 'ログイン中かつ存在しないタグを更新しようとした場合' do
+      before { sign_in(user) }
+
       it 'ステータスコード404を返す' do
         aggregate_failures do
           put '/tags/0', params: { tag: { name: 'Update Tag' } }, as: :json
@@ -102,10 +118,14 @@ RSpec.describe 'Tags' do
   end
 
   describe 'DELETE /tags/:id' do
-    context '存在するタグを削除しようとした場合' do
+    context 'ログイン中かつ存在するタグを削除しようとした場合' do
+      let!(:tag) { create(:tag, priority: 4) }
+
+      before { sign_in(user) }
+
       it 'タグが削除される' do
         aggregate_failures do
-          expect { delete "/tags/#{tags[1].id}" }.to change(Tag, :count).by(-1)
+          expect { delete "/tags/#{tag.id}" }.to change(Tag, :count).by(-1)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -113,7 +133,9 @@ RSpec.describe 'Tags' do
       end
     end
 
-    context '存在しないタグを削除しようとした場合' do
+    context 'ログイン中かつ存在しないタグを削除しようとした場合' do
+      before { sign_in(user) }
+
       it 'ステータスコード404を返す' do
         aggregate_failures do
           delete '/tags/0'
@@ -126,17 +148,20 @@ RSpec.describe 'Tags' do
       end
     end
 
-    context 'タグの削除に失敗する場合' do
+    context 'ログイン中かつタグの削除に失敗する場合' do
+      let!(:tag) { create(:tag, priority: 4) }
+
       before do
-        allow(Tag).to receive(:find).and_return(tags[1])
-        allow(tags[1]).to receive(:destroy).and_return(false)
+        sign_in(user)
+        allow(Tag).to receive(:find).and_return(tag)
+        allow(tag).to receive(:destroy).and_return(false)
       end
 
       it 'ステータスコード422を返す' do
         aggregate_failures do
-          expect { delete "/tags/#{tags[1].id}", as: :json }.not_to change(Tag, :count)
+          expect { delete "/tags/#{tag.id}", as: :json }.not_to change(Tag, :count)
           assert_request_schema_confirm
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
         end
       end

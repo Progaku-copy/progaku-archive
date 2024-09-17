@@ -1,6 +1,5 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'simplecov'
-require_relative 'simple_cov/formatter/branch_line_cov_formatter'
 
 SimpleCov.start 'rails' do
   add_filter '/app/channels/'
@@ -8,7 +7,6 @@ SimpleCov.start 'rails' do
   add_filter '/app/mailers/'
   enable_coverage :branch
   minimum_coverage line: 75, branch: 75
-  formatter SimpleCov::Formatter::BranchLineCovFormatter
 end
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
@@ -31,7 +29,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -77,4 +75,6 @@ RSpec.configure do |config|
   config.committee_options = {
     schema_path: Rails.root.join("doc/openapi.yml").to_s
   }
+
+  config.include AuthenticationHelpers, type: :request
 end
