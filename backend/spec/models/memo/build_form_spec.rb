@@ -9,7 +9,7 @@ RSpec.describe Memo::BuildForm do
       let(:params) { { title: 'Test Memo', content: 'This is a test memo', tag_ids: tag_ids } }
       let(:form) { described_class.new(params: params) }
 
-      specify '有効な状態であること' do
+      it '有効な状態であること' do
         expect(form).to be_valid
       end
     end
@@ -18,11 +18,11 @@ RSpec.describe Memo::BuildForm do
       let(:params) { { title: '', content: 'This is a test memo', tag_ids: tag_ids } }
       let(:form) { described_class.new(params: params) }
 
-      specify '無効な状態であること' do
+      it '無効な状態であること' do
         expect(form).not_to be_valid
       end
 
-      specify '適切なエラーメッセージが追加されていること' do
+      it '適切なエラーメッセージが追加されていること' do
         form.valid?
         expect(form.errors.full_messages).to eq ['タイトルを入力してください']
       end
@@ -32,11 +32,11 @@ RSpec.describe Memo::BuildForm do
       let(:params) { { title: 'Test Memo', content: '', tag_ids: tag_ids } }
       let(:form) { described_class.new(params: params) }
 
-      specify '無効な状態であること' do
+      it '無効な状態であること' do
         expect(form).not_to be_valid
       end
 
-      specify '適切なエラーメッセージが追加されていること' do
+      it '適切なエラーメッセージが追加されていること' do
         form.valid?
         expect(form.errors.full_messages).to eq ['コンテンツを入力してください']
       end
@@ -48,16 +48,16 @@ RSpec.describe Memo::BuildForm do
       let(:params) { { title: 'Test Memo', content: 'This is a test memo', tag_ids: tag_ids } }
       let(:form) { described_class.new(params: params) }
 
-      specify 'メモが新規作成されること' do
+      it 'メモが新規作成されること' do
         expect { form.save }.to change(Memo, :count).by(1)
       end
 
-      specify 'メモにタグが紐付けられること' do
+      it 'メモにタグが紐付けられること' do
         form.save
         expect(Memo.last.tags.pluck(:id)).to match_array(tag_ids)
       end
 
-      specify 'trueが返されること' do
+      it 'trueが返されること' do
         expect(form.save).to be_truthy
       end
     end
@@ -66,11 +66,11 @@ RSpec.describe Memo::BuildForm do
       let(:params) { { title: '', content: 'This is a test memo', tag_ids: tag_ids } }
       let(:form) { described_class.new(params: params) }
 
-      specify 'メモが新規作成されないこと' do
+      it 'メモが新規作成されないこと' do
         expect { form.save }.not_to(change(Memo, :count))
       end
 
-      specify 'falseが返されること' do
+      it 'falseが返されること' do
         expect(form.save).to be_falsey
       end
     end
