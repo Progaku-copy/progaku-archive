@@ -45,10 +45,10 @@ class MemosController < ApplicationController
   private
 
   def memo_params
-    params.require(:memo).permit(:title, :content)
+    params.require(:memo).permit(:title, :content, :poster)
   end
 
   def update_memo_params
-    params.require(:memo).permit(:content)
+    params.require(:memo).permit(:content, :poster)
   end
 end

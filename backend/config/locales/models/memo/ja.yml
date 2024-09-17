@@ -4,6 +4,7 @@ ja:
       memo:
         title: タイトル
         content: コンテンツ
+        poster: Slackでの投稿者名
       comment:
         content: 内容
       user:
