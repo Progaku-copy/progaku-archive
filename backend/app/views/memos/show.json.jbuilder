@@ -4,7 +4,7 @@ json.memo do
   json.id @memo.id
   json.title @memo.title
   json.content @memo.content
-  json.user_name @memo.user_name
+  json.poster @memo.poster
   json.created_at @memo.created_at
   json.updated_at @memo.updated_at
 

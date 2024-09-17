@@ -13,9 +13,9 @@ components:
         content:
           type: string
           example: メモの内容
-        user_name:
+        poster:
           type: string
-          example: ユーザ名
+          example: Slackでの投稿者名
         created_at:
           type: string
           format: date-time

@@ -4,16 +4,17 @@
 #
 # Table name: memos
 #
-#  id                           :bigint           not null, primary key
-#  content(メモの本文)          :text(65535)      not null
-#  title(メモのタイトル)        :string(255)      not null
-#  user_name(Slackのユーザー名) :string(21)       not null
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
+#  id                        :bigint           not null, primary key
+#  content(メモの本文)       :text(65535)      not null
+#  poster(Slackのユーザー名) :string(50)       not null
+#  title(メモのタイトル)     :string(255)      not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
 #
 class Memo < ApplicationRecord
-  validates :title, :content, presence: true
-  validates :user_name, presence: true, length: { maximum: 21 }
+  validates :title, presence: true
+  validates :content, presence: true
+  validates :poster, presence: true, length: { maximum: 50 }
   has_many :comments, dependent: :destroy
   has_many :memo_tags, dependent: :destroy
   has_many :tags, through: :memo_tags

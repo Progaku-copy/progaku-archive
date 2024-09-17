@@ -70,10 +70,11 @@ RSpec.describe 'MemosController' do
   end
 
   describe 'POST /memos' do
-    context 'ログイン中かつタイトルとコンテンツとユーザ名が有効な場合' do
+    context 'ログイン中かつタイトルとコンテンツと投稿者が有効な場合' do
       let(:valid_memo_params) do
-        { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5),
-          user_name: Faker::Name.name }
+        { title: Faker::Lorem.sentence(word_count: 3),
+          content: Faker::Lorem.paragraph(sentence_count: 5),
+          poster: Faker::Name.name }
       end
 
       before { sign_in(user) }
@@ -100,7 +101,7 @@ RSpec.describe 'MemosController' do
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
-          expect(response.parsed_body['errors']).to eq(%w[タイトルを入力してください コンテンツを入力してください ユーザ名を入力してください])
+          expect(response.parsed_body['errors']).to eq(%w[タイトルを入力してください コンテンツを入力してください Slackでの投稿者名を入力してください])
         end
       end
     end
