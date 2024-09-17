@@ -46,11 +46,7 @@ class MemosController < ApplicationController
 
   private
 
-  def create_params
-    params.require(:form).permit(:title, :content, tag_ids: [])
-  end
-
-  def update_params
-    params.require(:form).permit(:content, tag_ids: [])
+  def memo_params
+    params.require(:form).permit(:title, :content, :poster, tag_ids: [])
   end
 end

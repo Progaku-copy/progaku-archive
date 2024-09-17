@@ -4,17 +4,18 @@
 #
 # Table name: memos
 #
-#  id                    :bigint           not null, primary key
-#  content(メモの本文)   :text(65535)      not null
-#  title(メモのタイトル) :string(255)      not null
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
+#  id                        :bigint           not null, primary key
+#  content(メモの本文)       :text(65535)      not null
+#  poster(Slackのユーザー名) :string(50)       not null
+#  title(メモのタイトル)     :string(255)      not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
 #
 RSpec.describe Memo do
-  subject(:memo) { build(:memo) }
+  let(:memo) { build(:memo) }
 
   describe 'バリデーションのテスト' do
-    context 'title と content が有効な場合' do
+    context '属性が有効な場合' do
       it 'valid?メソッドがtrueを返すこと' do
         expect(memo).to be_valid
       end
@@ -23,52 +24,77 @@ RSpec.describe Memo do
     context 'titleが空文字の場合' do
       before { memo.title = '' }
 
-      it 'valid?メソッドがfalseを返すこと' do
-        expect(memo).not_to be_valid
-      end
-
-      it 'errorsに「タイトルを入力してください」と格納されること' do
-        memo.valid?
-        expect(memo.errors.full_messages).to eq ['タイトルを入力してください']
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(memo).not_to be_valid
+          expect(memo.errors.full_messages).to eq ['タイトルを入力してください']
+        end
       end
     end
 
     context 'titleがnilの場合' do
       before { memo.title = nil }
 
-      it 'valid?メソッドがfalseを返すこと' do
-        expect(memo).not_to be_valid
-      end
-
-      it 'errorsに「タイトルを入力してください」と格納されること' do
-        memo.valid?
-        expect(memo.errors.full_messages).to eq ['タイトルを入力してください']
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(memo).not_to be_valid
+          expect(memo.errors.full_messages).to eq ['タイトルを入力してください']
+        end
       end
     end
 
     context 'contentが空文字の場合' do
       before { memo.content = '' }
 
-      it 'valid?メソッドがfalseを返すこと' do
-        expect(memo).not_to be_valid
-      end
-
-      it 'errorsに「コンテンツを入力してください」と格納されること' do
-        memo.valid?
-        expect(memo.errors.full_messages).to eq ['コンテンツを入力してください']
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(memo).not_to be_valid
+          expect(memo.errors.full_messages).to eq ['コンテンツを入力してください']
+        end
       end
     end
 
     context 'contentがnilの場合' do
       before { memo.content = nil }
 
-      it 'valid?メソッドがfalseを返すこと' do
-        expect(memo).not_to be_valid
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(memo).not_to be_valid
+          expect(memo.errors.full_messages).to eq ['コンテンツを入力してください']
+        end
       end
+    end
 
-      it 'errorsに「コンテンツを入力してください」と格納されること' do
-        memo.valid?
-        expect(memo.errors.full_messages).to eq ['コンテンツを入力してください']
+    context 'posterが空文字の場合' do
+      before { memo.poster = '' }
+
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          memo.valid?
+          expect(memo.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+        end
+      end
+    end
+
+    context 'posterがnilの場合' do
+      before { memo.poster = nil }
+
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(memo).not_to be_valid
+          expect(memo.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+        end
+      end
+    end
+
+    context 'posterが50文字以上の場合' do
+      before { memo.poster = 'a' * 51 }
+
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(memo).not_to be_valid
+          expect(memo.errors.full_messages).to eq ['Slackでの投稿者名は50文字以内で入力してください']
+        end
       end
     end
   end

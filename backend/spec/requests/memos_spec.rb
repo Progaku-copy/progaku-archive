@@ -73,9 +73,11 @@ RSpec.describe 'MemosController' do
     let!(:tags) { create_list(:tag, 3) }
     let(:tag_ids) { tags.map(&:id) }
 
-    context 'ログイン中かつタイトルとコンテンツが有効な場合' do
+    context 'ログイン中かつタイトルとコンテンツと投稿者が有効な場合' do
       let(:valid_form_params) do
-        { title: Faker::Lorem.sentence(word_count: 3), content: Faker::Lorem.paragraph(sentence_count: 5),
+        { title: Faker::Lorem.sentence(word_count: 3),
+          content: Faker::Lorem.paragraph(sentence_count: 5),
+          poster: Faker::Name.name,
           tag_ids: tag_ids }
       end
 
@@ -96,7 +98,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'ログインしていてバリデーションエラーになる場合' do
-      let(:empty_memo_params) { { title: '', content: '', tag_ids: tag_ids } }
+      let(:empty_memo_params) { { title: '', content: '', user_name: '', tag_ids: tag_ids } }
 
       before { sign_in(user) }
 
@@ -110,7 +112,7 @@ RSpec.describe 'MemosController' do
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
-          expect(response.parsed_body['errors']).to eq(%w[タイトルを入力してください コンテンツを入力してください])
+          expect(response.parsed_body['errors']).to eq(%w[タイトルを入力してください コンテンツを入力してください Slackでの投稿者名を入力してください])
         end
       end
     end
@@ -145,7 +147,7 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context 'ログイン中かつバリデーションエラーになる場合' do
+    context 'ログイン中かつコンテンツが空の場合' do
       let(:existing_memo) { create(:memo) }
       let(:params) { { content: '', tag_ids: [existing_tags.last.id + 100] } }
 
@@ -163,21 +165,38 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context 'ログイン中かつタイトルを更新しようとした場合' do
-      let(:existing_memo) { create(:memo) }
-      let(:params) { { title: '新しいタイトル' } }
+  context 'ログイン中かつタイトルが有効な場合' do
+    let(:existing_memo) { create(:memo) }
+    let(:params) { { title: '新しいタイトル' } }
 
     before { sign_in(user) }
 
-      it 'タイトルが変更されていないことを確認する' do
-        aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
-          assert_request_schema_confirm
-          expect(response).to have_http_status(:unprocessable_entity)
-          existing_memo.reload
-          assert_response_schema_confirm(422)
-          expect(existing_memo.title).not_to eq('新しいタイトル')
-        end
+    it 'タイトルが更新され、204が返る' do
+      aggregate_failures do
+        put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+        assert_request_schema_confirm
+        expect(response).to have_http_status(:no_content)
+        existing_memo.reload
+        assert_response_schema_confirm(204)
+        expect(existing_memo.title).to eq('新しいタイトル')
+      end
+    end
+  end
+
+  context 'ログイン中かつタイトルが無効な場合' do
+    let(:existing_memo) { create(:memo) }
+    let(:params) { { title: '' } }
+
+    before { sign_in(user) }
+
+    it '422が返り、エラーメッセージが返る' do
+      aggregate_failures do
+        put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+        assert_request_schema_confirm
+        existing_memo.reload
+        expect(response).to have_http_status(:unprocessable_content)
+        assert_response_schema_confirm(422)
+        expect(response.parsed_body['errors']).to eq(['タイトルを入力してください'])
       end
     end
   end
