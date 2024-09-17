@@ -87,8 +87,8 @@ RSpec.describe 'MemosController' do
         aggregate_failures do
           expect do
             post '/memos', params: { form: valid_form_params }, as: :json
-          end.to change(Memo, :count).by(+1)
-          expect(Memo.last.tags.count).to eq(3)
+          end.to change { Memo.count }.by(1)
+             .and change { MemoTag.count }.by(3)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -98,7 +98,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'ログインしていてバリデーションエラーになる場合' do
-      let(:empty_memo_params) { { title: '', content: '', user_name: '', tag_ids: tag_ids } }
+      let(:empty_memo_params) { { title: '', content: '', poster: '', tag_ids: } }
 
       before { sign_in(user) }
 
@@ -108,11 +108,11 @@ RSpec.describe 'MemosController' do
             expect do
               post '/memos', params: { form: empty_memo_params }, as: :json
             end.not_to change(Memo, :count)
-          end.not_to change(Tag, :count)
+          end.not_to change(MemoTag, :count)
           assert_request_schema_confirm
           expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
-          expect(response.parsed_body['errors']).to eq(%w[タイトルを入力してください コンテンツを入力してください Slackでの投稿者名を入力してください])
+          expect(response.parsed_body['errors']).to eq ['メモに関連するエラーがあります']
         end
       end
     end
@@ -165,46 +165,47 @@ RSpec.describe 'MemosController' do
       end
     end
 
-  context 'ログイン中かつタイトルが有効な場合' do
-    let(:existing_memo) { create(:memo) }
-    let(:params) { { title: '新しいタイトル' } }
+    context 'ログイン中かつタイトルが有効な場合' do
+      let(:existing_memo) { create(:memo) }
+      let(:params) { { title: '新しいタイトル' } }
 
-    before { sign_in(user) }
+      before { sign_in(user) }
 
-    it 'タイトルが更新され、204が返る' do
-      aggregate_failures do
-        put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
-        assert_request_schema_confirm
-        expect(response).to have_http_status(:no_content)
-        existing_memo.reload
-        assert_response_schema_confirm(204)
-        expect(existing_memo.title).to eq('新しいタイトル')
+      it 'タイトルが更新され、204が返る' do
+        aggregate_failures do
+          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+          assert_request_schema_confirm
+          expect(response).to have_http_status(:no_content)
+          existing_memo.reload
+          assert_response_schema_confirm(204)
+          expect(existing_memo.title).to eq('新しいタイトル')
+        end
       end
     end
-  end
 
-  context 'ログイン中かつタイトルが無効な場合' do
-    let(:existing_memo) { create(:memo) }
-    let(:params) { { title: '' } }
+    context 'ログイン中かつタイトルが無効な場合' do
+      let(:existing_memo) { create(:memo) }
+      let(:params) { { title: '' } }
 
-    before { sign_in(user) }
+      before { sign_in(user) }
 
-    it '422が返り、エラーメッセージが返る' do
-      aggregate_failures do
-        put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
-        assert_request_schema_confirm
-        existing_memo.reload
-        expect(response).to have_http_status(:unprocessable_content)
-        assert_response_schema_confirm(422)
-        expect(response.parsed_body['errors']).to eq(['タイトルを入力してください'])
+      it '422が返り、エラーメッセージが返る' do
+        aggregate_failures do
+          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+          assert_request_schema_confirm
+          existing_memo.reload
+          expect(response).to have_http_status(:unprocessable_content)
+          assert_response_schema_confirm(422)
+          expect(response.parsed_body['errors']).to eq(['タイトルを入力してください'])
+        end
       end
     end
-  end
 
-  context 'ログインしていない場合' do
-    it '401が返る' do
-      put '/memos/0'
-      expect(response).to have_http_status(:unauthorized)
+    context 'ログインしていない場合' do
+      it '401が返る' do
+        put '/memos/0'
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 
