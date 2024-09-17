@@ -4,20 +4,50 @@ RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
   describe 'GET /memos' do
-    let!(:memos) { create_list(:memo, 3) }
+    let!(:memos) { create_list(:memo, 20) }
 
-    context 'ログイン中かつメモが存在する場合' do
+    context 'ログイン中かつメモが存在し、パラメータが指定されていない場合' do
       before { sign_in(user) }
 
-      it '全てのメモが降順で返る' do
+      it '降順で、1ページ目に10件のメモが返ること' do
         aggregate_failures do
           get '/memos'
-          expect(response).to have_http_status(:ok)
+          assert_request_schema_confirm
           assert_response_schema_confirm(200)
-          expect(response.parsed_body['memos'].length).to eq(3)
+          expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
           expected_memo_ids = memos.reverse.map(&:id)
+          expect(result_memo_ids).to eq(expected_memo_ids[0..9])
+          expect(response.parsed_body['total_page']).to eq(2)
+        end
+      end
+    end
+
+    context 'ログイン中かつメモが存在し、ページが指定された場合' do
+      before { sign_in(user) }
+
+      it '降順で、指定されたページに10件のメモが返ること' do
+        aggregate_failures do
+          get '/memos', params: { page: 2 }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          expect(response.parsed_body['memos'].length).to eq(10)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
           expect(result_memo_ids).to eq(expected_memo_ids)
+          expect(response.parsed_body['total_page']).to eq(2)
+        end
+      end
+    end
+
+    context 'ログイン中かつメモが存在し、無効なページが指定された場合' do
+      before { sign_in(user) }
+
+      it '400が返る' do
+        get '/memos', params: { page: 'a' }
+        aggregate_failures do
+          assert_response_schema_confirm(400)
+          expect(response.parsed_body['error']).to eq('ページパラメータが無効です')
         end
       end
     end
