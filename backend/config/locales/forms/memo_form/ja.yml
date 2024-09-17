@@ -1,7 +1,14 @@
 ja:
   activemodel:
     attributes:
-      memo_form:
-        title: タイトル
-        content: コンテンツ
-        tag_ids: タグ
+      memo/build_form:
+        memo: メモ
+        memo_tag: メモタグ
+    errors:
+      models:
+        memo/build_form:
+          attributes:
+            memo:
+              invalid_association: 'に関連するエラーがあります'
+            memo_tag:
+              invalid_association: 'に関連するエラーがあります'
