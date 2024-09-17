@@ -4,8 +4,6 @@ class Memo
   class UpdateForm
     include ActiveModel::Validations
 
-    attr_reader :params, :memo
-
     validate :memo_valid?
 
     def initialize(params:, memo:)
@@ -26,6 +24,8 @@ class Memo
     end
 
     private
+
+    attr_reader :params, :memo
 
     def memo_valid?
       memo.assign_attributes(content: params[:content])
