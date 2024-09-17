@@ -16,7 +16,7 @@ class MemosController < ApplicationController
 
   # POST /memos
   def create
-    form = Memo::BuildForm.new(params: create_params)
+    form = Memo::BuildForm.new(params: memo_params)
 
     if form.save
       head :no_content
@@ -28,7 +28,7 @@ class MemosController < ApplicationController
   # PUT /memos/:id
   def update
     memo = Memo.find(params[:id])
-    form = Memo::UpdateForm.new(params: update_params, memo: memo)
+    form = Memo::UpdateForm.new(params: memo_params, memo: memo)
 
     if form.save
       head :no_content

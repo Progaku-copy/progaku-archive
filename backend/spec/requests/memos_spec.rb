@@ -106,7 +106,7 @@ RSpec.describe 'MemosController' do
         aggregate_failures do
           expect do
             expect do
-              post '/memos', params: { form: invalid_form_params }, as: :json
+              post '/memos', params: { form: empty_memo_params }, as: :json
             end.not_to change(Memo, :count)
           end.not_to change(Tag, :count)
           assert_request_schema_confirm
