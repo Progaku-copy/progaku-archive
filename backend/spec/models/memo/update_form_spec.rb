@@ -7,71 +7,57 @@ RSpec.describe Memo::UpdateForm do
   let!(:memo) { create(:memo) }
   let(:tag_ids) { tags.map(&:id) }
 
-  before { create(:memo_tag, memo: memo, tag: tag) }
+  before { create(:memo_tag, memo:, tag:) }
 
   describe '#バリデーション' do
-    context 'フォームの値が有効な場合' do
-      let(:params) { { content: 'Updated memo content', tag_ids: tag_ids } }
-      let(:memo_update_form) { described_class.new(params: params, memo: memo) }
+    context 'フォーム入力値が有効な場合' do
+      let(:params) { { title: memo.title, content: 'Updated memo content', tag_ids: } }
+      let(:form) { described_class.new(params:, id: memo.id) }
 
-      specify '有効な状態であること' do
-        expect(memo_update_form).to be_valid
-      end
-
-      specify 'メモの内容が更新されること' do
-        expect { memo_update_form.save }.to change { memo.reload.content }.to('Updated memo content')
-      end
-
-      specify 'メモのタグが更新されること' do
-        memo_update_form.save
-        expect(memo.reload.tags.pluck(:id)).to match_array(tag_ids)
+      it 'フォームが有効な状態であること' do
+        expect(form).to be_valid
       end
     end
 
-    context 'メモの内容が空文字の場合' do
-      let(:params) { { content: '', tag_ids: tag_ids } }
-      let(:memo_update_form) { described_class.new(params: params, memo: memo) }
+    context 'フォーム入力値が無効な場合' do
+      let(:params) { { title: '', content: '', tag_ids: } }
+      let(:form) { described_class.new(params:, id: memo.id) }
 
-      specify '無効な状態であること' do
-        expect(memo_update_form).not_to be_valid
-      end
-
-      specify '適切なエラーメッセージが追加されていること' do
-        memo_update_form.valid?
-        expect(memo_update_form.errors.full_messages).to eq ['コンテンツを入力してください']
+      it 'フォームが無効な状態であり、適切なエラーメッセージが追加されていること' do
+        aggregate_failures do
+          expect(form).not_to be_valid
+          expect(form.errors.full_messages).to eq ['メモに関連するエラーがあります']
+        end
       end
     end
   end
 
   describe '#save' do
     context 'フォームの値が有効な場合' do
-      let(:params) { { content: 'Updated memo content', tag_ids: tag_ids } }
-      let(:memo_update_form) { described_class.new(params: params, memo: memo) }
+      let(:params) { { title: memo.title, content: 'Updated memo content', tag_ids: } }
+      let(:form) { described_class.new(params:, id: memo.id) }
 
-      specify 'メモの内容が更新されること' do
-        expect { memo_update_form.save }.to change { memo.reload.content }.to('Updated memo content')
-      end
-
-      specify 'メモのタグが更新されること' do
-        memo_update_form.save
-        expect(memo.reload.tags.pluck(:id)).to match_array(tag_ids)
-      end
-
-      specify 'trueが返されること' do
-        expect(memo_update_form.save).to be_truthy
+      it 'メモとタグが更新され、trueが返されること' do
+        aggregate_failures do
+          expect(form.save).to be true
+          expect(memo.reload.content).to eq 'Updated memo content'
+          expect(memo.reload.memo_tags.pluck(:tag_id)).to match_array(tag_ids)
+          expect(memo.reload.memo_tags.pluck(:tag_id)).not_to include(tag.id)
+        end
       end
     end
 
     context 'フォームの値が無効な場合' do
-      let(:params) { { content: '', tag_ids: tag_ids } }
-      let(:memo_update_form) { described_class.new(params: params, memo: memo) }
+      let(:params) { { title: '', content: '', tag_ids: } }
+      let(:form) { described_class.new(params:, id: memo.id) }
 
-      specify 'メモの内容が更新されないこと' do
-        expect { memo_update_form.save }.not_to(change { memo.reload.content })
-      end
-
-      specify 'falseが返されること' do
-        expect(memo_update_form.save).to be_falsey
+      it 'メモとタグが更新されず、falseが返されること' do
+        aggregate_failures do
+          expect(form.save).to be false
+          expect(memo.reload.title).to eq memo.title
+          expect(memo.reload.content).to eq memo.content
+          expect { form.save }.not_to(change { memo.reload.memo_tags.pluck(:tag_id) })
+        end
       end
     end
   end
