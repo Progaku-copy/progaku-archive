@@ -4,7 +4,8 @@ class Memo
   class UpdateForm
     include ActiveModel::Validations
 
-    validate :memo_valid?
+    validates :memo, cascade: true
+    validates :memo_tags, cascade: true, if: -> { errors.empty? }
 
     def initialize(params:, memo:)
       @params = params
@@ -26,13 +27,6 @@ class Memo
     private
 
     attr_reader :params, :memo
-
-    def memo_valid?
-      memo.assign_attributes(content: params[:content])
-      return if memo.valid? # rubocop:disable Style/ReturnNilInPredicateMethodDefinition
-
-      memo.errors.each { |error| errors.add(:base, error.full_message) }
-    end
 
     def resolve_memo_tags
       memo.memo_tags.destroy_all
