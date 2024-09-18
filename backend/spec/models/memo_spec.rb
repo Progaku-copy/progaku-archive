@@ -108,8 +108,8 @@ RSpec.describe Memo do
     end
   end
 
-  describe 'Query::resolve(memos:, params:)' do
-    let!(:memos) do
+  describe 'Query::call(filter_collection:, params:)' do
+    let(:memos) do
       {
         '1' => create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１'),
         '2' => create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２'),
@@ -120,40 +120,53 @@ RSpec.describe Memo do
     context 'タイトルで検索した場合' do
       it 'タイトルフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
         aggregate_failures do
-          result = Memo::Query.resolve(memos: described_class.all, params: { title: 'テスト' })
-          expect(result).to include(memos['1'], memos['2'])
-          expect(result).not_to include(memos['3'])
+          result = Memo::Query.call(filter_collection: described_class.all, params: { title: 'テスト' })
+          expect(result[:memos]).to include(memos['1'], memos['2'])
+          expect(result[:memos]).not_to include(memos['3'])
         end
       end
     end
 
     context 'コンテンツで検索した場合' do
       it 'コンテンツフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
-        result = Memo::Query.resolve(memos: described_class.all, params: { content: 'コンテンツ' })
-        expect(result).to include(memos['1'], memos['2'], memos['3'])
+        result = Memo::Query.call(filter_collection: described_class.all, params: { content: 'コンテンツ' })
+        expect(result[:memos]).to include(memos['1'], memos['2'], memos['3'])
       end
     end
 
     context 'タイトルとコンテンツで検索した場合' do
       it 'タイトルとコンテンツの両方でフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
         aggregate_failures do
-          result = Memo::Query.resolve(memos: described_class.all, params: { title: 'その他', content: 'コンテンツ' })
-          expect(result).to include(memos['3'])
-          expect(result).not_to include(memos['1'], memos['2'])
+          result = Memo::Query.call(filter_collection: described_class.all, params: { title: 'その他', content: 'コンテンツ' })
+          expect(result[:memos]).to include(memos['3'])
+          expect(result[:memos]).not_to include(memos['1'], memos['2'])
         end
       end
     end
 
     context '並び替え機能のテスト' do
       it '昇順機能が正しく機能していること' do
-        result = Memo::Query.resolve(memos: described_class.all, params: { order: 'asc' })
-        expect(result).to eq([memos['1'], memos['2'], memos['3']])
+        result = Memo::Query.call(filter_collection: described_class.all, params: { order: 'asc' })
+        expect(result[:memos]).to contain_exactly(memos['1'], memos['2'], memos['3'])
       end
 
       it 'デフォルトで降順機能が正しく機能されていること' do
         aggregate_failures do
-          result = Memo::Query.resolve(memos: described_class.all, params: {})
-          expect(result).to eq([memos['3'], memos['2'], memos['1']])
+          result = Memo::Query.call(filter_collection: described_class.all, params: {})
+          expect(result[:memos]).to contain_exactly(memos['3'], memos['2'], memos['1'])
+        end
+      end
+    end
+
+    context 'ページネーション機能のテスト' do
+      before { create_list(:memo, 20) }
+
+      it '指定したページ数のメモ、総数、ページ数、ページ番号が取得できること' do
+        aggregate_failures do
+          result = Memo::Query.call(filter_collection: described_class.all, params: { page: 2 })
+          memo_relation = described_class.order(id: :desc).limit(10).offset(10)
+          expect(result[:memos].pluck(:id)).to eq(memo_relation.pluck(:id))
+          expect(result[:total_page]).to eq(2)
         end
       end
     end
