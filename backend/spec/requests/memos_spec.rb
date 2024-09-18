@@ -117,8 +117,8 @@ RSpec.describe 'MemosController' do
         aggregate_failures do
           expect do
             post '/memos', params: { form: valid_form_params }, as: :json
-          end.to change { Memo.count }.by(1)
-             .and change { MemoTag.count }.by(3)
+          end.to change(Memo, :count).by(1)
+             .and change(MemoTag, :count).by(3)
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -161,8 +161,10 @@ RSpec.describe 'MemosController' do
       let(:existing_tags) { create_list(:tag, 3) }
       let(:params) { { content: '新しいコンテンツ', tag_ids: [existing_tags.second.id] } }
 
-      before { sign_in(user) }
-      before { create(:memo_tag, memo: existing_memo, tag: existing_tags.first) }
+      before do
+        sign_in(user)
+        create(:memo_tag, memo: existing_memo, tag: existing_tags.first)
+      end
 
       it 'memoが更新され、204になる' do
         aggregate_failures do
@@ -173,13 +175,14 @@ RSpec.describe 'MemosController' do
           existing_memo.reload
           expect(existing_memo.content).to eq('新しいコンテンツ')
           expect(existing_memo.tags.first.name).to eq(existing_tags.second.name)
+          expect(existing_memo.tags).not_to include(existing_tags.first)
         end
       end
     end
 
     context 'ログイン中かつコンテンツが空の場合' do
       let(:existing_memo) { create(:memo) }
-      let(:params) { { content: '', tag_ids: [existing_tags.last.id + 100] } }
+      let(:params) { { content: '' } }
 
       before { sign_in(user) }
 
@@ -190,7 +193,7 @@ RSpec.describe 'MemosController' do
           existing_memo.reload
           expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
-          expect(response.parsed_body['errors']).to eq(%w[コンテンツを入力してください])
+          expect(response.parsed_body['errors']).to eq(%w[メモに関連するエラーがあります])
         end
       end
     end
@@ -203,7 +206,8 @@ RSpec.describe 'MemosController' do
 
       it 'タイトルが更新され、204が返る' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+          # binding.pry
+          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           existing_memo.reload
@@ -221,12 +225,12 @@ RSpec.describe 'MemosController' do
 
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
           assert_request_schema_confirm
           existing_memo.reload
           expect(response).to have_http_status(:unprocessable_content)
           assert_response_schema_confirm(422)
-          expect(response.parsed_body['errors']).to eq(['タイトルを入力してください'])
+          expect(response.parsed_body['errors']).to eq(['メモに関連するエラーがあります'])
         end
       end
     end
