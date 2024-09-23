@@ -39,8 +39,8 @@ class Memo
         Memo.find(id)
             .tap do |model|
               model.assign_attributes(
-                title: params[:title] || model.title,
-                content: params[:content] || model.content,
+                title: params[:title],
+                content: params[:content],
                 tags: tags
               )
             end
