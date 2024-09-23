@@ -46,7 +46,9 @@ class Memo
             end
     end
 
-    def tags = Tag.where(id: params[:tag_ids])
+    def tag_ids = params[:tag_ids] || []
+
+    def tags = Tag.where(id: tag_ids)
 
     def memo_tags_to_remove
       current_tag_ids = memo.memo_tags.pluck(:tag_id)
