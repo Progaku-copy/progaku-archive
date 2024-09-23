@@ -5,7 +5,7 @@ class Memo
     include ActiveModel::Validations
 
     validates :memo, cascade: true
-    validates :memo_tags_to_add, cascade: true, if: -> { errors.empty? }
+    validates :memo_tags, cascade: true, if: -> { errors.empty? }
 
     def initialize(params:, id:)
       @params = params
@@ -17,7 +17,8 @@ class Memo
 
       ActiveRecord::Base.transaction do
         save_record!(memo)
-        memo_tags_to_remove.destroy_all
+        memo.memo_tags.select(&:marked_for_destruction?)
+                      .each { destroy_record!(_1) }
       end
 
       errors.empty?
@@ -29,6 +30,13 @@ class Memo
 
     def save_record!(record)
       return true if record.save
+
+      errors.add(:base, record.error_message)
+      raise ActiveRecord::Rollback
+    end
+
+    def destroy_record!(record)
+      return true if record.destroy
 
       errors.add(:base, record.error_message)
       raise ActiveRecord::Rollback
@@ -46,20 +54,28 @@ class Memo
             end
     end
 
+    def memo_tags
+      @memo_tags ||= memo.tap do |model|
+        mark_for_destruction_memo_tags!
+      end.memo_tags.reject(&:marked_for_destruction?)
+    end
+
     def tag_ids = params[:tag_ids] || []
 
     def tags = Tag.where(id: tag_ids)
 
-    def memo_tags_to_remove
-      current_tag_ids = memo.memo_tags.pluck(:tag_id)
-      tag_ids_to_remove = current_tag_ids - (params[:tag_ids] || [])
-      memo.memo_tags.where(tag_id: tag_ids_to_remove)
+    def before_save_tag_ids
+      @before_save_tag_ids ||= memo.memo_tags.pluck(:tag_id)
     end
 
-    def memo_tags_to_add
-      current_tag_ids = memo.memo_tags.pluck(:tag_id)
-      tag_ids_to_add = (params[:tag_ids] || []) - current_tag_ids
-      @memo_tags_to_add = tag_ids_to_add.map { |tag_id| memo.memo_tags.build(tag_id: tag_id) }
+    def destroy_target_tag_ids = before_save_tag_ids - tag_ids
+
+    def mark_for_destruction_memo_tags!
+      memo.memo_tags.each do |memo_tag|
+        next unless destroy_target_tag_ids.include?(memo_tag.tag_id)
+
+        memo_tag.mark_for_destruction
+      end
     end
   end
 end
