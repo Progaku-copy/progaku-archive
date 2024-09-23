@@ -159,7 +159,12 @@ RSpec.describe 'MemosController' do
     context 'ログインしていてコンテンツが有効な場合' do
       let(:existing_memo) { create(:memo) }
       let(:existing_tags) { create_list(:tag, 3) }
-      let(:params) { { content: '新しいコンテンツ', tag_ids: [existing_tags.second.id] } }
+      let(:params) do
+        { title: existing_memo.title,
+          content: '新しいコンテンツ',
+          poster: existing_memo.poster,
+          tag_ids: [existing_tags.second.id] }
+      end
 
       before do
         sign_in(user)
@@ -183,6 +188,12 @@ RSpec.describe 'MemosController' do
     context 'ログイン中かつコンテンツが空の場合' do
       let(:existing_memo) { create(:memo) }
       let(:params) { { content: '' } }
+      let(:params) do
+        { title: existing_memo.title,
+          content: '',
+          poster: existing_memo.poster,
+          tag_ids: [] }
+      end
 
       before { sign_in(user) }
 
@@ -200,13 +211,17 @@ RSpec.describe 'MemosController' do
 
     context 'ログイン中かつタイトルが有効な場合' do
       let(:existing_memo) { create(:memo) }
-      let(:params) { { title: '新しいタイトル' } }
+      let(:params) do
+        { title: '新しいタイトル',
+          content: existing_memo.content,
+          poster: existing_memo.poster,
+          tag_ids: [] }
+      end
 
       before { sign_in(user) }
 
       it 'タイトルが更新され、204が返る' do
         aggregate_failures do
-          # binding.pry
           put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
@@ -219,7 +234,12 @@ RSpec.describe 'MemosController' do
 
     context 'ログイン中かつタイトルが無効な場合' do
       let(:existing_memo) { create(:memo) }
-      let(:params) { { title: '' } }
+      let(:params) do
+        { title: '',
+          content: existing_memo.content,
+          poster: existing_memo.poster,
+          tag_ids: [] }
+      end
 
       before { sign_in(user) }
 
