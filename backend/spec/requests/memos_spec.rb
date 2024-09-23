@@ -187,7 +187,6 @@ RSpec.describe 'MemosController' do
 
     context 'ログイン中かつコンテンツが空の場合' do
       let(:existing_memo) { create(:memo) }
-      let(:params) { { content: '' } }
       let(:params) do
         { title: existing_memo.title,
           content: '',

@@ -18,7 +18,7 @@ class Memo
       ActiveRecord::Base.transaction do
         save_record!(memo)
         memo.memo_tags.select(&:marked_for_destruction?)
-                      .each { destroy_record!(_1) }
+            .each { destroy_record!(_1) }
       end
 
       errors.empty?
@@ -55,7 +55,7 @@ class Memo
     end
 
     def memo_tags
-      @memo_tags ||= memo.tap do |model|
+      @memo_tags ||= memo.tap do |_model|
         mark_for_destruction_memo_tags!
       end.memo_tags.reject(&:marked_for_destruction?)
     end
