@@ -28,7 +28,6 @@ class MemosController < ApplicationController
 
   # PUT /memos/:id
   def update
-    # memo = Memo.find(params[:id])
     form = Memo::UpdateForm.new(params: form_params, id: params[:id])
 
     if form.save
