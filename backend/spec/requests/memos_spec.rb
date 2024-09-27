@@ -116,7 +116,7 @@ RSpec.describe 'MemosController' do
       it 'memoレコードが追加され、204が返る' do
         aggregate_failures do
           expect do
-            post '/memos', params: { form: valid_form_params }, as: :json
+            post '/memos', params: { memo: valid_form_params }, as: :json
           end.to change(Memo, :count).by(1)
              .and change(MemoTag, :count).by(3)
           assert_request_schema_confirm
@@ -136,7 +136,7 @@ RSpec.describe 'MemosController' do
         aggregate_failures do
           expect do
             expect do
-              post '/memos', params: { form: empty_memo_params }, as: :json
+              post '/memos', params: { memo: empty_memo_params }, as: :json
             end.not_to change(Memo, :count)
           end.not_to change(MemoTag, :count)
           assert_request_schema_confirm
@@ -173,7 +173,7 @@ RSpec.describe 'MemosController' do
 
       it 'memoが更新され、204になる' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           assert_response_schema_confirm(204)
@@ -198,7 +198,7 @@ RSpec.describe 'MemosController' do
 
       it '422になり、エラーメッセージが返る' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
           assert_request_schema_confirm
           existing_memo.reload
           expect(response).to have_http_status(:unprocessable_content)
@@ -221,7 +221,7 @@ RSpec.describe 'MemosController' do
 
       it 'タイトルが更新され、204が返る' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
           assert_request_schema_confirm
           expect(response).to have_http_status(:no_content)
           existing_memo.reload
@@ -244,7 +244,7 @@ RSpec.describe 'MemosController' do
 
       it '422が返り、エラーメッセージが返る' do
         aggregate_failures do
-          put "/memos/#{existing_memo.id}", params: { form: params }, as: :json
+          put "/memos/#{existing_memo.id}", params: { memo: params }, as: :json
           assert_request_schema_confirm
           existing_memo.reload
           expect(response).to have_http_status(:unprocessable_content)
