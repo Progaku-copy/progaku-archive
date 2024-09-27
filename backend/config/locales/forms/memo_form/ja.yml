@@ -1,0 +1,23 @@
+ja:
+  activemodel:
+    attributes:
+      memo/build_form:
+        memo: メモ
+        memo_tag: メモタグ
+      memo/update_form:
+        memo: メモ
+        memo_tag: メモタグ
+    errors:
+      models:
+        memo/build_form:
+          attributes:
+            memo:
+              invalid_association: 'に関連するエラーがあります'
+            memo_tag:
+              invalid_association: 'に関連するエラーがあります'
+        memo/update_form:
+          attributes:
+            memo:
+              invalid_association: 'に関連するエラーがあります'
+            memo_tag:
+              invalid_association: 'に関連するエラーがあります'
