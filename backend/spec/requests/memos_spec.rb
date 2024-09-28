@@ -58,6 +58,63 @@ RSpec.describe 'MemosController' do
         expect(response).to have_http_status(:unauthorized)
       end
     end
+
+    context 'あいまい検索する場合' do
+      let!(:first_memo) { create(:memo, title: 'メモタイトル１', content: 'メモコンテンツ１') }
+      let!(:second_memo) { create(:memo, title: 'メモタイトル２', content: 'メモコンテンツ２') }
+
+      before { sign_in(user) }
+
+      it 'タイトルで部分一致するメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { title: 'メモ' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          expect(response.parsed_body['memos'].length).to eq(2)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to contain_exactly(first_memo.id, second_memo.id)
+        end
+      end
+
+      it 'コンテンツで部分一致するメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { content: 'メモ' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          expect(response.parsed_body['memos'].length).to eq(2)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to contain_exactly(first_memo.id, second_memo.id)
+        end
+      end
+    end
+
+    context '並び替えする場合' do
+      let!(:memo_a) { create(:memo, title: 'タイトルA', content: 'コンテンツA') }
+      let!(:memo_b) { create(:memo, title: 'タイトルB', content: 'コンテンツB') }
+      let!(:memo_c) { create(:memo, title: 'タイトルC', content: 'コンテンツC') }
+
+      before { sign_in(user) }
+
+      it '昇順でメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { order: 'asc', title: 'タイトル' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to eq([memo_a.id, memo_b.id, memo_c.id])
+        end
+      end
+
+      it '降順でメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { order: 'desc', title: 'タイトル' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to eq([memo_c.id, memo_b.id, memo_a.id])
+        end
+      end
+    end
   end
 
   describe 'GET /memos/:id' do
