@@ -24,6 +24,13 @@ components:
           type: string
           format: date-time
           example: 2021-01-01T00:00:00.000Z
+        tag_names:
+          type: array
+          items:
+            type: string
+          example:
+            - タグ1
+            - タグ2
         comments:
           type: array
           items:
