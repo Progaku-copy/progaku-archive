@@ -10,7 +10,7 @@ class MemosController < ApplicationController
 
   # GET /memos/:id
   def show
-    @memo = Memo.find(params[:id])
+    @memo = Memo.includes(:tags).find(params[:id])
     @comments = @memo.comments.order(id: 'DESC')
     render 'show', status: :ok
   end

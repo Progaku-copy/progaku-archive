@@ -8,6 +8,8 @@ json.memo do
   json.created_at @memo.created_at
   json.updated_at @memo.updated_at
 
+  json.tag_names @memo.tags.map(&:name)
+
   json.comments @comments do |comment|
     json.id comment.id
     json.content comment.content
