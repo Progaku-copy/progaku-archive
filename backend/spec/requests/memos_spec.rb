@@ -4,20 +4,23 @@ RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
   describe 'GET /memos' do
-    let!(:memos) { create_list(:memo, 20) }
+    let!(:memos) { create_list(:memo, 20, :with_tags) }
 
     context 'ログイン中かつメモが存在し、パラメータが指定されていない場合' do
       before { sign_in(user) }
 
       it '降順で、1ページ目に10件のメモが返ること' do
         aggregate_failures do
-          get '/memos'
+          get '/memos', headers: { Accept: 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
           expected_memo_ids = memos.reverse.map(&:id)
+          result_memo_tags = response.parsed_body['memos'].map { _1['tag_names'] } # rubocop:disable Rails/Pluck
+          expected_memo_tags = memos.reverse.map { |memo| memo.tags.map(&:name) }
           expect(result_memo_ids).to eq(expected_memo_ids[0..9])
+          expect(result_memo_tags).to eq(expected_memo_tags[0..9])
           expect(response.parsed_body['total_page']).to eq(2)
         end
       end
@@ -28,13 +31,16 @@ RSpec.describe 'MemosController' do
 
       it '降順で、指定されたページに10件のメモが返ること' do
         aggregate_failures do
-          get '/memos', params: { page: 2 }
+          get '/memos', params: { page: 2 }, headers: { Accept: 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
           expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
+          result_memo_tags = response.parsed_body['memos'].map { _1['tag_names'] } # rubocop:disable Rails/Pluck
+          expected_memo_tags = memos.reverse.map { |memo| memo.tags.map(&:name) }
           expect(result_memo_ids).to eq(expected_memo_ids)
+          expect(result_memo_tags).to eq(expected_memo_tags[10..19])
           expect(response.parsed_body['total_page']).to eq(2)
         end
       end
