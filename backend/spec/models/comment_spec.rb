@@ -4,11 +4,12 @@
 #
 # Table name: comments
 #
-#  id              :bigint           not null, primary key
-#  content(内容)   :string(1024)     not null
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  memo_id(メモID) :bigint           not null
+#  id                        :bigint           not null, primary key
+#  content(内容)             :string(1024)     not null
+#  poster(Slackのユーザー名) :string(50)       not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  memo_id(メモID)           :bigint           not null
 #
 # Indexes
 #
@@ -69,6 +70,39 @@ RSpec.describe Comment do
 
       it 'valid?メソッドがtrueを返すこと' do
         expect(comment).to be_valid
+      end
+    end
+
+    context 'posterが空文字の場合' do
+      before { comment.poster = '' }
+
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          comment.valid?
+          expect(comment.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+        end
+      end
+    end
+
+    context 'posterがnilの場合' do
+      before { comment.poster = nil }
+
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(comment).not_to be_valid
+          expect(comment.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+        end
+      end
+    end
+
+    context 'posterが50文字以上の場合' do
+      before { comment.poster = 'a' * 51 }
+
+      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
+        aggregate_failures do
+          expect(comment).not_to be_valid
+          expect(comment.errors.full_messages).to eq ['Slackでの投稿者名は50文字以内で入力してください']
+        end
       end
     end
   end
