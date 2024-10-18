@@ -37,11 +37,7 @@ class Memo < ApplicationRecord
             params: params
           )
         memo_count = memo_relation.count
-        paginated_memos = PageFilter.resolve(scope: memo_relation, params: params)
-        memo_with_tags = paginated_memos.includes(:tags).map do |memo|
-          memo.as_json.merge(tag_names: memo.tags.map(&:name))
-        end
-        { memos: memo_with_tags,
+        { memos: PageFilter.resolve(scope: memo_relation, params: params),
           total_page: memo_count.zero? ? FIRST_PAGE : (memo_count / PageFilter::MAX_ITEMS).ceil }
       end
 
