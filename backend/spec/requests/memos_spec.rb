@@ -4,7 +4,9 @@ RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
   describe 'GET /memos' do
-    let!(:memos) do
+    # そこそこ重いSQLを発行するので、一回だけ呼ばれるようにしたい。
+    # ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/let_it_be.md
+    let_it_be(:memos) do
       memos_data = Array.new(20) do
         {
           title: Faker::Lorem.sentence(word_count: 3),
@@ -19,7 +21,9 @@ RSpec.describe 'MemosController' do
       Memo.order(:id).last(20)
     end
 
-    before do
+    # そこそこ重いSQLを発行するので、一回だけ呼ばれるようにしたい。
+    # ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/before_all.md
+    before_all do
       # Tagの生成
       tag_data = Array.new(3) do |n|
         {

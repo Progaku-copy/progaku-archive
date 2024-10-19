@@ -1,5 +1,9 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'simplecov'
+# ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/let_it_be.md
+require 'test_prof/recipes/rspec/let_it_be'
+# ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/before_all.md
+require 'test_prof/recipes/rspec/before_all'
 
 SimpleCov.start 'rails' do
   add_filter '/app/channels/'

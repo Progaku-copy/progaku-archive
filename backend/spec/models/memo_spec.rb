@@ -169,7 +169,7 @@ RSpec.describe Memo do
           }
         end
 
-        Memo.bulk_import!(memos_data)
+        described_class.bulk_import!(memos_data)
       end
 
       it '指定したページ数のメモ、総数が取得できること' do
