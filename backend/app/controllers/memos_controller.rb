@@ -3,8 +3,11 @@
 class MemosController < ApplicationController
   # GET /memos
   def index
-    @memos = Memo::Query.call(filter_collection: Memo.preload(:tags), params: params)
-    render 'index', status: :ok
+    @memos = \
+      Memo::Query.call(
+        filter_collection: Memo.preload(:tags),
+        params: params
+      )
   rescue TypeError
     render json: { error: 'ページパラメータが無効です' }, status: :bad_request
   end
@@ -13,7 +16,6 @@ class MemosController < ApplicationController
   def show
     @memo = Memo.preload(:tags).find(params[:id])
     @comments = @memo.comments.order(id: 'DESC')
-    render 'show', status: :ok
   end
 
   # POST /memos
