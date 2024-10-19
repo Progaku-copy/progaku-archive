@@ -42,6 +42,10 @@ gem 'rails-i18n' # i18n 日本語化対応用gem
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem "rack-cors"
 
+# bulk upsertを実現する
+# Github: https://github.com/zdennis/activerecord-import
+gem 'activerecord-import'
+
 group :development, :test do
   # Github: https://github.com/willnet/committee-rails
   gem 'committee-rails'
@@ -86,4 +90,6 @@ group :test do
 
   # Github: https://github.com/simplecov-ruby/simplecov
   gem 'simplecov', require: false # テストカバレッジを取得するためのgem
+
+  gem "test-prof", "~> 1.4"
 end

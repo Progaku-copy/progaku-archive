@@ -4,20 +4,67 @@ RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
   describe 'GET /memos' do
-    let!(:memos) { create_list(:memo, 20) }
+    # そこそこ重いSQLを発行するので、一回だけ呼ばれるようにしたい。
+    # ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/let_it_be.md
+    let_it_be(:memos) do
+      memos_data = Array.new(20) do
+        {
+          title: Faker::Lorem.sentence(word_count: 3),
+          content: Faker::Lorem.paragraph(sentence_count: 5),
+          poster: Faker::Name.name,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      end
+
+      Memo.bulk_import!(memos_data)
+      Memo.order(:id).last(20)
+    end
+
+    # そこそこ重いSQLを発行するので、一回だけ呼ばれるようにしたい。
+    # ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/before_all.md
+    before_all do
+      # Tagの生成
+      tag_data = Array.new(3) do |n|
+        {
+          name: "tag-#{n + 1}",
+          priority: n + 1,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      end
+      Tag.bulk_import!(tag_data)
+      tags = Tag.pluck(:id)
+
+      # MemoTagの生成
+      memo_tags_data = memos.flat_map do |memo|
+        tags.map do |tag_id|
+          {
+            memo_id: memo.id,
+            tag_id: tag_id,
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
+      end
+      MemoTag.bulk_import!(memo_tags_data)
+    end
 
     context 'ログイン中かつメモが存在し、パラメータが指定されていない場合' do
       before { sign_in(user) }
 
       it '降順で、1ページ目に10件のメモが返ること' do
         aggregate_failures do
-          get '/memos'
+          get '/memos', headers: { Accept: 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
           expected_memo_ids = memos.reverse.map(&:id)
+          result_memo_tags = response.parsed_body['memos'].map { _1['tag_names'] } # rubocop:disable Rails/Pluck
+          expected_memo_tags = memos.reverse.map { |memo| memo.tags.map(&:name) }
           expect(result_memo_ids).to eq(expected_memo_ids[0..9])
+          expect(result_memo_tags).to eq(expected_memo_tags[0..9])
           expect(response.parsed_body['total_page']).to eq(2)
         end
       end
@@ -28,13 +75,16 @@ RSpec.describe 'MemosController' do
 
       it '降順で、指定されたページに10件のメモが返ること' do
         aggregate_failures do
-          get '/memos', params: { page: 2 }
+          get '/memos', params: { page: 2 }, headers: { Accept: 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
           expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
+          result_memo_tags = response.parsed_body['memos'].map { _1['tag_names'] } # rubocop:disable Rails/Pluck
+          expected_memo_tags = memos.reverse.map { |memo| memo.tags.map(&:name) }
           expect(result_memo_ids).to eq(expected_memo_ids)
+          expect(result_memo_tags).to eq(expected_memo_tags[10..19])
           expect(response.parsed_body['total_page']).to eq(2)
         end
       end

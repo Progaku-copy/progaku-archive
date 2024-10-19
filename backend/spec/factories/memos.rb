@@ -16,5 +16,11 @@ FactoryBot.define do
     title { Faker::Lorem.sentence(word_count: 3) }
     content { Faker::Lorem.paragraph(sentence_count: 5) }
     poster { Faker::Name.name }
+
+    trait :with_tags do
+      after :create do |memo|
+        create_list(:memo_tag, 3, memo: memo)
+      end
+    end
   end
 end
