@@ -4,7 +4,47 @@ RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
   describe 'GET /memos' do
-    let!(:memos) { create_list(:memo, 20, :with_tags) }
+    let!(:memos) do
+      memos_data = Array.new(20) do
+        {
+          title: Faker::Lorem.sentence(word_count: 3),
+          content: Faker::Lorem.paragraph(sentence_count: 5),
+          poster: Faker::Name.name,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      end
+
+      Memo.bulk_import!(memos_data)
+      Memo.order(:id).last(20)
+    end
+
+    before do
+      # Tagの生成
+      tag_data = Array.new(3) do |n|
+        {
+          name: "tag-#{n + 1}",
+          priority: n + 1,
+          created_at: Time.current,
+          updated_at: Time.current
+        }
+      end
+      Tag.bulk_import!(tag_data)
+      tags = Tag.pluck(:id)
+
+      # MemoTagの生成
+      memo_tags_data = memos.flat_map do |memo|
+        tags.map do |tag_id|
+          {
+            memo_id: memo.id,
+            tag_id: tag_id,
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
+      end
+      MemoTag.bulk_import!(memo_tags_data)
+    end
 
     context 'ログイン中かつメモが存在し、パラメータが指定されていない場合' do
       before { sign_in(user) }

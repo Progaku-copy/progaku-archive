@@ -158,7 +158,19 @@ RSpec.describe Memo do
     end
 
     context 'ページネーション機能のテスト' do
-      before { create_list(:memo, 20) }
+      before do
+        memos_data = Array.new(20) do
+          {
+            title: Faker::Lorem.sentence(word_count: 3),
+            content: Faker::Lorem.paragraph(sentence_count: 5),
+            poster: Faker::Name.name,
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
+
+        Memo.bulk_import!(memos_data)
+      end
 
       it '指定したページ数のメモ、総数が取得できること' do
         aggregate_failures do
