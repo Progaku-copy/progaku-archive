@@ -15,7 +15,7 @@ class MemosController < ApplicationController
   # GET /memos/:id
   def show
     @memo = Memo.preload(:tags).find(params[:id])
-    @comments = @memo.comments.order(id: 'DESC')
+    @comments = @memo.comments.order(id: :desc)
   end
 
   # POST /memos
