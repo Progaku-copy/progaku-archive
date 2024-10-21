@@ -143,6 +143,29 @@ RSpec.describe Memo do
       end
     end
 
+    context  'タグで検索した場合' do
+      before do
+        tag_data = Array.new(3) do |n|
+          {
+            id: n + 1,
+            name: "tag-#{n + 1}",
+            priority: n + 1,
+            created_at: Time.current,
+            updated_at: Time.current
+          }
+        end
+
+        Tag.bulk_import!(tag_data)
+
+        memos[0].tags << Tag.find(1)
+      end
+
+      it 'タグフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
+        result = Memo::Query.call(filter_collection: described_class.preload(:tags), params: { tag_ids: 1 })
+        expect(result[:memos]).to include(memos[0])
+      end
+    end
+
     context '並び替え機能のテスト' do
       it '昇順機能が正しく機能していること' do
         result = Memo::Query.call(filter_collection: described_class.all, params: { order: 'asc' })
