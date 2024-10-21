@@ -161,7 +161,7 @@ RSpec.describe Memo do
       end
 
       it 'タグフィルターが正しく機能し、期待されるメモが取得できることを確認する' do
-        result = Memo::Query.call(filter_collection: described_class.preload(:tags), params: { tag: 1 })
+        result = Memo::Query.call(filter_collection: described_class.preload(:tags), params: { tag_ids: 1 })
         expect(result[:memos]).to include(memos[0])
       end
     end

@@ -81,9 +81,9 @@ class Memo < ApplicationRecord
     module TagFilter
       # params[:tag] に値が存在する場合、タグが一致するメモを返す
       def self.resolve(scope:, params:)
-        return scope if params[:tag].blank?
+        return scope if params[:tag_ids].blank?
 
-        scope.joins(:tags).where(tags: { id: params[:tag] })
+        scope.joins(:tags).where(tags: { id: params[:tag_ids] })
       end
     end
     private_constant :TagFilter
