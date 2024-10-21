@@ -7,6 +7,7 @@ ja:
         poster: Slackでの投稿者名
       comment:
         content: 内容
+        poster: Slackでの投稿者名
       user:
         account_name: アカウント名
         password: パスワード

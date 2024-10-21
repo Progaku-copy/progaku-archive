@@ -4,11 +4,12 @@
 #
 # Table name: comments
 #
-#  id              :bigint           not null, primary key
-#  content(内容)   :string(1024)     not null
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  memo_id(メモID) :bigint           not null
+#  id                        :bigint           not null, primary key
+#  content(内容)             :string(1024)     not null
+#  poster(Slackのユーザー名) :string(50)       not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  memo_id(メモID)           :bigint           not null
 #
 # Indexes
 #
@@ -20,5 +21,6 @@
 #
 class Comment < ApplicationRecord
   validates :content, presence: true, length: { maximum: 1024 }
+  validates :poster, presence: true, length: { maximum: 50 }
   belongs_to :memo
 end

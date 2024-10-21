@@ -6,7 +6,10 @@ RSpec.describe 'CommentsController' do
   describe 'POST /memos/:memo_id/comments' do
     context 'ログイン中かつコンテンツが有効な場合' do
       let(:memo) { create(:memo) }
-      let(:params) { { content: Faker::Lorem.paragraph(sentence_count: 3) } }
+      let(:params) do
+        { content: Faker::Lorem.paragraph(sentence_count: 3),
+          poster: Faker::Name.name }
+      end
 
       before { sign_in(user) }
 
@@ -34,7 +37,7 @@ RSpec.describe 'CommentsController' do
             post "/memos/#{memo.id}/comments", params: { comment: params }, as: :json
           end.not_to change(Comment, :count)
           expect(response).to have_http_status(:unprocessable_content)
-          expect(response.parsed_body['errors']).to eq(['内容を入力してください'])
+          expect(response.parsed_body['errors']).to eq %w[内容を入力してください Slackでの投稿者名を入力してください]
         end
       end
     end
