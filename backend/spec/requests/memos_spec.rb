@@ -61,8 +61,10 @@ RSpec.describe 'MemosController' do
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
           expected_memo_ids = memos.reverse.map(&:id)
-          result_memo_tags = response.parsed_body['memos'].map { _1['tag_names'] } # rubocop:disable Rails/Pluck
-          expected_memo_tags = memos.reverse.map { |memo| memo.tags.map(&:name) }
+          result_memo_tags = response.parsed_body['memos'].map { _1['tags'] } # rubocop:disable Rails/Pluck
+          expected_memo_tags = memos.reverse.map do |memo|
+            memo.tags.map { |tag| { id: tag.id, name: tag.name } }
+          end.as_json
           expect(result_memo_ids).to eq(expected_memo_ids[0..9])
           expect(result_memo_tags).to eq(expected_memo_tags[0..9])
           expect(response.parsed_body['total_page']).to eq(2)
@@ -81,8 +83,10 @@ RSpec.describe 'MemosController' do
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
           expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
-          result_memo_tags = response.parsed_body['memos'].map { _1['tag_names'] } # rubocop:disable Rails/Pluck
-          expected_memo_tags = memos.reverse.map { |memo| memo.tags.map(&:name) }
+          result_memo_tags = response.parsed_body['memos'].map { _1['tags'] } # rubocop:disable Rails/Pluck
+          expected_memo_tags = memos.reverse.map do |memo|
+            memo.tags.map { |tag| { id: tag.id, name: tag.name } }
+          end.as_json
           expect(result_memo_ids).to eq(expected_memo_ids)
           expect(result_memo_tags).to eq(expected_memo_tags[10..19])
           expect(response.parsed_body['total_page']).to eq(2)
