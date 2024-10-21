@@ -20,7 +20,7 @@ class Memo < ApplicationRecord
   has_many :tags, through: :memo_tags
 
   module Query
-    FILTERS = %i[TitleFilter ContentFilter OrderFilter].freeze
+    FILTERS = %i[TitleFilter ContentFilter OrderFilter TagFilter].freeze
     private_constant :FILTERS
     FIRST_PAGE = 1
     private_constant :FIRST_PAGE
@@ -77,6 +77,16 @@ class Memo < ApplicationRecord
       end
     end
     private_constant :ContentFilter
+
+    module TagFilter
+      # params[:tag] に値が存在する場合、タグが一致するメモを返す
+      def self.resolve(scope:, params:)
+        return scope if params[:tag].blank?
+
+        scope.joins(:tags).where(tags: { id: params[:tag] })
+      end
+    end
+    private_constant :TagFilter
 
     module OrderFilter
       DEFAULT_ORDER = 'desc'
