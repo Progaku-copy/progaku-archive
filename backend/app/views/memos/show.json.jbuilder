@@ -8,7 +8,10 @@ json.memo do
   json.created_at @memo.created_at
   json.updated_at @memo.updated_at
 
-  json.tag_names @memo.tags.map(&:name)
+  json.tags @memo.tags do |tag|
+    json.id tag.id
+    json.name tag.name
+  end
 
   json.comments @comments do |comment|
     json.id comment.id
