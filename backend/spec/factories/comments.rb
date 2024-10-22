@@ -4,11 +4,12 @@
 #
 # Table name: comments
 #
-#  id              :bigint           not null, primary key
-#  content(内容)   :string(1024)     not null
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  memo_id(メモID) :bigint           not null
+#  id                        :bigint           not null, primary key
+#  content(内容)             :string(1024)     not null
+#  poster(Slackのユーザー名) :string(50)       not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  memo_id(メモID)           :bigint           not null
 #
 # Indexes
 #
@@ -22,6 +23,7 @@
 FactoryBot.define do
   factory :comment do
     content { 'sample_comment' }
+    poster { Faker::Name.name }
     memo
   end
 end
