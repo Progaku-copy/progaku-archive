@@ -71,7 +71,7 @@ RSpec.describe 'MemosController' do
 
       it 'タイトルで部分一致するメモが返る' do
         aggregate_failures do
-          get '/memos', params: { title: 'メモ' }
+          get '/memos', params: { title: 'メモ' }, headers: { 'Accept' => 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           expect(response.parsed_body['memos'].length).to eq(2)
@@ -86,7 +86,7 @@ RSpec.describe 'MemosController' do
 
       it 'コンテンツで部分一致するメモが返る' do
         aggregate_failures do
-          get '/memos', params: { content: 'メモ' }
+          get '/memos', params: { content: 'メモ' }, headers: { 'Accept' => 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           expect(response.parsed_body['memos'].length).to eq(2)
@@ -101,7 +101,7 @@ RSpec.describe 'MemosController' do
 
       it '昇順でメモが返る' do
         aggregate_failures do
-          get '/memos', params: { order: 'asc', title: 'タイトル' }
+          get '/memos', params: { order: 'asc', title: 'タイトル' }, headers: { 'Accept' => 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
@@ -115,7 +115,7 @@ RSpec.describe 'MemosController' do
 
       it '降順でメモが返る' do
         aggregate_failures do
-          get '/memos', params: { order: 'desc', title: 'タイトル' }
+          get '/memos', params: { order: 'desc', title: 'タイトル' }, headers: { 'Accept' => 'application/json' }
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
