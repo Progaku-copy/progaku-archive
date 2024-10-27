@@ -3,6 +3,7 @@
 RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
+  # rubocop:disable RSpec/RepeatedExampleGroupDescription
   describe 'GET /memos' do
     let!(:memos) { create_list(:memo, 20) }
 
@@ -58,11 +59,14 @@ RSpec.describe 'MemosController' do
         expect(response).to have_http_status(:unauthorized)
       end
     end
+  end
 
-    context 'あいまい検索する場合' do
-      let!(:first_memo) { create(:memo, title: 'メモタイトル１', content: 'メモコンテンツ１') }
-      let!(:second_memo) { create(:memo, title: 'メモタイトル２', content: 'メモコンテンツ２') }
+  describe 'GET /memos' do
+    let!(:first_memo) { create(:memo, title: 'メモタイトル１', content: 'メモコンテンツ１') }
+    let!(:second_memo) { create(:memo, title: 'メモタイトル２', content: 'メモコンテンツ２') }
+    let!(:third_memo) { create(:memo, title: 'その他タイトル', content: 'その他のコンテンツ') }
 
+    context 'ログイン中かつ、タイトルが指定された場合' do
       before { sign_in(user) }
 
       it 'タイトルで部分一致するメモが返る' do
@@ -75,6 +79,10 @@ RSpec.describe 'MemosController' do
           expect(result_memo_ids).to contain_exactly(first_memo.id, second_memo.id)
         end
       end
+    end
+
+    context 'ログイン中かつ、コンテンツが指定された場合' do
+      before { sign_in(user) }
 
       it 'コンテンツで部分一致するメモが返る' do
         aggregate_failures do
@@ -88,11 +96,7 @@ RSpec.describe 'MemosController' do
       end
     end
 
-    context '並び替えする場合' do
-      let!(:memo_a) { create(:memo, title: 'タイトルA', content: 'コンテンツA') }
-      let!(:memo_b) { create(:memo, title: 'タイトルB', content: 'コンテンツB') }
-      let!(:memo_c) { create(:memo, title: 'タイトルC', content: 'コンテンツC') }
-
+    context 'ログイン中かつ、並び順にascが指定された場合' do
       before { sign_in(user) }
 
       it '昇順でメモが返る' do
@@ -101,9 +105,13 @@ RSpec.describe 'MemosController' do
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
-          expect(result_memo_ids).to eq([memo_a.id, memo_b.id, memo_c.id])
+          expect(result_memo_ids).to eq([first_memo.id, second_memo.id, third_memo.id])
         end
       end
+    end
+
+    context 'ログイン中かつ、並び順にdescが指定された場合' do
+      before { sign_in(user) }
 
       it '降順でメモが返る' do
         aggregate_failures do
@@ -111,11 +119,12 @@ RSpec.describe 'MemosController' do
           assert_request_schema_confirm
           assert_response_schema_confirm(200)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
-          expect(result_memo_ids).to eq([memo_c.id, memo_b.id, memo_a.id])
+          expect(result_memo_ids).to eq([third_memo.id, second_memo.id, first_memo.id])
         end
       end
     end
   end
+  # rubocop:enable RSpec/RepeatedExampleGroupDescription
 
   describe 'GET /memos/:id' do
     let!(:memo) { create(:memo) }
