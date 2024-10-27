@@ -13,5 +13,5 @@ services:
     env_file:
       - ./infra/env/backend-prod.env
     ports:
-      - 8080:8080
-    command: sh -c "rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb -p 8080 -b \"http://160.16.51.70\""
+      - 80:8080
+    command: sh -c "rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb"
