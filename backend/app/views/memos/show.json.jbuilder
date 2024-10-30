@@ -16,6 +16,7 @@ json.memo do
   json.comments @comments do |comment|
     json.id comment.id
     json.content comment.content
+    json.poster comment.poster
     json.created_at comment.created_at
     json.memo_id comment.memo_id
   end
