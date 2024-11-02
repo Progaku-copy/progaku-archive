@@ -8,6 +8,8 @@ services:
       dockerfile: ./infra/backend/Dockerfile
     volumes:
       - ./backend:/usr/src/app
+      - /etc/letsencrypt/live/progaku-archive.work/privkey.pem:/etc/letsencrypt/live/progaku-archive.work/privkey.pem
+      - /etc/letsencrypt/live/progaku-archive.work/fullchain.pem:/etc/letsencrypt/live/progaku-archive.work/fullchain.pem
     stdin_open: true
     tty: true
     env_file:
