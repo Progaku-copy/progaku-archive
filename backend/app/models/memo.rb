@@ -22,7 +22,7 @@
 class Memo < ApplicationRecord
   validates :title, presence: true
   validates :content, presence: true
-  validates :poster, presence: true, length: { maximum: 50 }
+  validates :poster, length: { maximum: 50 }
   belongs_to :poster
   has_many :comments, dependent: :destroy
   has_many :memo_tags, dependent: :destroy

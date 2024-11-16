@@ -55,7 +55,7 @@ namespace :slack do
   end
 end
 
-# メソッドの定義
+# @return Hash
 def fetch_slack_users
   slack_user_response = ApiClient.fetch_data(SLACK_USER_URL)
 
