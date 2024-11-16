@@ -23,7 +23,7 @@
 #
 class Comment < ApplicationRecord
   validates :content, presence: true, length: { maximum: 1024 }
-  validates :poster, presence: true, length: { maximum: 50 }
+  validates :poster, length: { maximum: 50 }
   belongs_to :memo
   belongs_to :poster
 end
