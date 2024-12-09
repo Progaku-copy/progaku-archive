@@ -4,17 +4,26 @@
 #
 # Table name: memos
 #
-#  id                        :bigint           not null, primary key
-#  content(メモの本文)       :text(65535)      not null
-#  poster(Slackのユーザー名) :string(50)       not null
-#  title(メモのタイトル)     :string(255)      not null
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
+#  id                                 :bigint           not null, primary key
+#  content(メモの本文)                :text(65535)      not null
+#  poster_user_key(Slackの投稿者のID) :string(255)      not null
+#  title(メモのタイトル)              :string(255)      not null
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#
+# Indexes
+#
+#  fk_memos_poster_user_key  (poster_user_key)
+#
+# Foreign Keys
+#
+#  fk_memos_poster_user_key  (poster_user_key => posters.user_key)
 #
 class Memo < ApplicationRecord
   validates :title, presence: true
   validates :content, presence: true
-  validates :poster, presence: true, length: { maximum: 50 }
+  validates :poster, length: { maximum: 50 }
+  belongs_to :poster
   has_many :comments, dependent: :destroy
   has_many :memo_tags, dependent: :destroy
   has_many :tags, through: :memo_tags
@@ -39,6 +48,21 @@ class Memo < ApplicationRecord
         memo_count = memo_relation.count
         { memos: PageFilter.resolve(scope: memo_relation, params: params),
           total_page: memo_count.zero? ? FIRST_PAGE : (memo_count / PageFilter::MAX_ITEMS).ceil }
+      end
+
+      def build_from_slack_posts(posts)
+        posts.map do |post|
+          post['reactions'].any? { |reaction| reaction["name"] == "アーカイブ" }
+
+          new
+          {
+            title: post['text'][0..20],
+            content: post['text'],
+            poster: post['user'],
+            slack_ts: post['ts']
+          }
+
+        end
       end
 
       private
