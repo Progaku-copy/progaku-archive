@@ -10,9 +10,24 @@ module SlackApiClient
   SLACK_THREAD_BASE_URL = 'https://slack.com/api/conversations.replies'
   private_constant :SLACK_USER_URL, :SLACK_CHANNEL_BASE_URL, :SLACK_THREAD_BASE_URL
 
+  SLACK_CHANNELS = [
+    { channel_id: 'C05SMFBJ4FP', channel_name: '就活関連の共有や情報' }
+  ].freeze
+  private_constant :SLACK_CHANNELS
+
   class << self
     def fetch_slack_users
       fetch_data(SLACK_USER_URL)
+    end
+
+    def fetch_archive_posts
+      SLACK_CHANNELS.reduce([]) do |result, channel|
+        result << {
+          channel_id: channel[:channel_id],
+          channel_name: channel[:channel_name],
+          posts: fetch_posts(channel[:channel_id])
+        }
+      end
     end
 
     def fetch_posts(channel_id)

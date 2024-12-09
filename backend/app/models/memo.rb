@@ -50,6 +50,21 @@ class Memo < ApplicationRecord
           total_page: memo_count.zero? ? FIRST_PAGE : (memo_count / PageFilter::MAX_ITEMS).ceil }
       end
 
+      def build_from_slack_posts(posts)
+        posts.map do |post|
+          post['reactions'].any? { |reaction| reaction["name"] == "アーカイブ" }
+
+          new
+          {
+            title: post['text'][0..20],
+            content: post['text'],
+            poster: post['user'],
+            slack_ts: post['ts']
+          }
+
+        end
+      end
+
       private
 
       # 各フィルタを順次適用してメモをフィルタリングする
