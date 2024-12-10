@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   post 'login', to: 'sessions#create'
   delete 'logout', to: 'sessions#destroy'
 
+  namespace :slack do
+    put 'posters', to: 'posters#update'
+  end
+
   namespace :admin do
     resources :users, only: %i[create]
   end
