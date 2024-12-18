@@ -3,7 +3,6 @@
 RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
-  # rubocop:disable RSpec/RepeatedExampleGroupDescription
   describe 'GET /memos' do
     let!(:memos) { create_list(:memo, 20) }
 
@@ -59,14 +58,18 @@ RSpec.describe 'MemosController' do
         expect(response).to have_http_status(:unauthorized)
       end
     end
-  end
 
-  describe 'GET /memos' do
-    let!(:first_memo) { create(:memo, title: 'メモタイトル１', content: 'メモコンテンツ１') }
-    let!(:second_memo) { create(:memo, title: 'メモタイトル２', content: 'メモコンテンツ２') }
-    let!(:third_memo) { create(:memo, title: 'その他タイトル', content: 'その他のコンテンツ') }
+    # rubocop:disable RSpec/LetSetup
+    shared_context 'メモデータ' do
+      let!(:first_memo) { create(:memo, title: 'メモタイトル１', content: 'メモコンテンツ１') }
+      let!(:second_memo) { create(:memo, title: 'メモタイトル２', content: 'メモコンテンツ２') }
+      let!(:third_memo) { create(:memo, title: 'その他タイトル', content: 'その他のコンテンツ') }
+    end
+    # rubocop:enable RSpec/LetSetup
 
     context 'ログイン中かつ、タイトルが指定された場合' do
+      include_context 'メモデータ'
+
       before { sign_in(user) }
 
       it 'タイトルで部分一致するメモが返る' do
@@ -82,6 +85,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'ログイン中かつ、コンテンツが指定された場合' do
+      include_context 'メモデータ'
       before { sign_in(user) }
 
       it 'コンテンツで部分一致するメモが返る' do
@@ -97,6 +101,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'ログイン中かつ、並び順にascが指定された場合' do
+      include_context 'メモデータ'
       before { sign_in(user) }
 
       it '昇順でメモが返る' do
@@ -111,6 +116,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'ログイン中かつ、並び順にdescが指定された場合' do
+      include_context 'メモデータ'
       before { sign_in(user) }
 
       it '降順でメモが返る' do
@@ -124,7 +130,6 @@ RSpec.describe 'MemosController' do
       end
     end
   end
-  # rubocop:enable RSpec/RepeatedExampleGroupDescription
 
   describe 'GET /memos/:id' do
     let!(:memo) { create(:memo) }
