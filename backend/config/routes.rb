@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   namespace :slack do
     put 'posters', to: 'posters#update'
+    put 'posts', to: 'posts#update'
   end
 
   namespace :admin do

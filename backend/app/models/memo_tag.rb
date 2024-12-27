@@ -26,4 +26,27 @@ class MemoTag < ApplicationRecord
   belongs_to :tag
 
   validates :memo_id, uniqueness: { scope: :tag_id }
+
+  def self.build_tags_for_post(channel_data)
+    channel_data.each do |channel|
+      # アーカイブされた投稿を抽出
+      archived_posts = channel[:posts]['messages'].select do |post|
+        post[:reactions]&.any? { |reaction| reaction['name'] == 'アーカイブ' }
+      end
+
+      # アーカイブされた投稿のts を抽出
+      ts_values = archived_posts.pluck(:ts)
+
+      # ts をKeyに posts の id を取得
+      memo_ids = Memo.where(ts: ts_values).pluck(:id)
+
+      # memo_tags 用のインスタンスを作成
+      memo_ids.map do |memo_id|
+        MemoTag.new(
+          memo_id: memo_id,
+          tag_id: channel[:tag_id]
+        )
+      end
+    end
+  end
 end

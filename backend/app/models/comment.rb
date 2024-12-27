@@ -25,5 +25,26 @@ class Comment < ApplicationRecord
   validates :content, presence: true, length: { maximum: 1024 }
   validates :poster, length: { maximum: 50 }
   belongs_to :memo
-  belongs_to :poster
+  belongs_to :poster, class_name: 'Poster', foreign_key: 'poster_user_key', inverse_of: :comments
+
+  # Slack APIから取得した投稿情報からアーカイブ対象のコメントのHashを生成する
+  # @param channels_data [Array<SlackApiClient::SlackPost>] Slackの投稿情報
+  # @return [Array<Hash>] アーカイブ対象のコメント情報
+  def self.build_archive_comments(channels_data)
+    channels_data.flat_map do |post|
+      next unless post.thread_ts
+
+      thread_list = SlackApiClient.fetch_archive_threads(post.channel_id, post.thread_ts)
+
+      memo_id = Memo.find_by(slack_ts: post.ts).id
+
+      thread_list.map do |thread|
+        {
+          content: thread.thread_text,
+          poster_user_key: thread.poster_user_key,
+          memo_id: memo_id
+        }
+      end
+    end
+  end
 end
