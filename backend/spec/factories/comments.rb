@@ -13,8 +13,8 @@
 #
 # Indexes
 #
-#  fk_comments_poster_user_key  (poster_user_key)
-#  index_comments_on_memo_id    (memo_id)
+#  index_comments_on_memo_id          (memo_id)
+#  index_comments_on_poster_user_key  (poster_user_key)
 #
 # Foreign Keys
 #

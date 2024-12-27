@@ -18,7 +18,7 @@ ActiveRecord::Schema[7.2].define(version: 0) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["memo_id"], name: "index_comments_on_memo_id"
-    t.index ["poster_user_key"], name: "fk_comments_poster_user_key"
+    t.index ["poster_user_key"], name: "index_comments_on_poster_user_key"
   end
 
   create_table "memo_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -35,9 +35,11 @@ ActiveRecord::Schema[7.2].define(version: 0) do
     t.string "title", null: false, comment: "メモのタイトル"
     t.text "content", null: false, comment: "メモの本文"
     t.string "poster_user_key", null: false, comment: "Slackの投稿者のID"
+    t.string "slack_ts", null: false, comment: "Slackの投稿時刻"
     t.timestamp "created_at", null: false
     t.timestamp "updated_at", null: false
-    t.index ["poster_user_key"], name: "fk_memos_poster_user_key"
+    t.index ["poster_user_key"], name: "index_memos_on_poster_user_key"
+    t.index ["slack_ts"], name: "index_memos_on_slack_ts", unique: true
   end
 
   create_table "posters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

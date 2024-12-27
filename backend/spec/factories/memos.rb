@@ -7,13 +7,15 @@
 #  id                                 :bigint           not null, primary key
 #  content(メモの本文)                :text(65535)      not null
 #  poster_user_key(Slackの投稿者のID) :string(255)      not null
+#  slack_ts(Slackの投稿時刻)          :string(255)      not null
 #  title(メモのタイトル)              :string(255)      not null
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
 #
 # Indexes
 #
-#  fk_memos_poster_user_key  (poster_user_key)
+#  index_memos_on_poster_user_key  (poster_user_key)
+#  index_memos_on_slack_ts         (slack_ts) UNIQUE
 #
 # Foreign Keys
 #
