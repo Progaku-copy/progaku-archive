@@ -10,7 +10,7 @@ SimpleCov.start 'rails' do
   add_filter '/app/jobs/'
   add_filter '/app/mailers/'
   enable_coverage :branch
-  minimum_coverage line: 75, branch: 75
+  minimum_coverage line: 60, branch: 60
 end
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'

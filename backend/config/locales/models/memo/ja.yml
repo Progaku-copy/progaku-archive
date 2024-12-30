@@ -4,10 +4,12 @@ ja:
       memo:
         title: タイトル
         content: コンテンツ
-        poster: Slackでの投稿者名
+        poster: SlackのユーザーID
+        slack_ts: Slackのタイムスタンプ
       comment:
         content: 内容
-        poster: Slackでの投稿者名
+        poster: SlackのユーザーID
+        slack_parent_ts: Slackのタイムスタンプ
       user:
         account_name: アカウント名
         password: パスワード

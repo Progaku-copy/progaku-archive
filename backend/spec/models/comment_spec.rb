@@ -4,20 +4,24 @@
 #
 # Table name: comments
 #
-#  id                        :bigint           not null, primary key
-#  content(内容)             :string(1024)     not null
-#  poster(Slackのユーザー名) :string(50)       not null
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  memo_id(メモID)           :bigint           not null
+#  id                                             :bigint           not null, primary key
+#  content(内容)                                  :string(1024)     not null
+#  poster_user_key(Slackの投稿者のID)             :string(255)      not null
+#  slack_parent_ts(Slackの親メッセージの投稿時刻) :string(255)      not null
+#  created_at                                     :datetime         not null
+#  updated_at                                     :datetime         not null
+#  memo_id(メモID)                                :bigint           not null
 #
 # Indexes
 #
-#  index_comments_on_memo_id  (memo_id)
+#  index_comments_on_memo_id          (memo_id)
+#  index_comments_on_poster_user_key  (poster_user_key)
+#  index_comments_on_slack_parent_ts  (slack_parent_ts) UNIQUE
 #
 # Foreign Keys
 #
-#  fk_comments_memo_id  (memo_id => memos.id)
+#  fk_comments_memo_id          (memo_id => memos.id)
+#  fk_comments_poster_user_key  (poster_user_key => posters.user_key)
 #
 RSpec.describe Comment do
   subject(:comment) { build(:comment) }
@@ -73,35 +77,35 @@ RSpec.describe Comment do
       end
     end
 
-    context 'posterが空文字の場合' do
-      before { comment.poster = '' }
+    context 'poster_user_keyが空文字の場合' do
+      before { comment.poster_user_key = '' }
 
       it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
         aggregate_failures do
           comment.valid?
-          expect(comment.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+          expect(comment.errors.full_messages).to eq ['SlackのユーザーIDを入力してください']
         end
       end
     end
 
-    context 'posterがnilの場合' do
-      before { comment.poster = nil }
+    context 'poster_user_keyがnilの場合' do
+      before { comment.poster_user_key = nil }
 
       it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
         aggregate_failures do
           expect(comment).not_to be_valid
-          expect(comment.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+          expect(comment.errors.full_messages).to eq ['SlackのユーザーIDを入力してください']
         end
       end
     end
 
-    context 'posterが50文字以上の場合' do
-      before { comment.poster = 'a' * 51 }
+    context 'poster_user_keyが50文字以上の場合' do
+      before { comment.poster_user_key = 'a' * 51 }
 
       it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
         aggregate_failures do
           expect(comment).not_to be_valid
-          expect(comment.errors.full_messages).to eq ['Slackでの投稿者名は50文字以内で入力してください']
+          expect(comment.errors.full_messages).to eq ['SlackのユーザーIDを入力してください']
         end
       end
     end

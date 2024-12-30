@@ -4,17 +4,32 @@
 #
 # Table name: memos
 #
-#  id                        :bigint           not null, primary key
-#  content(メモの本文)       :text(65535)      not null
-#  poster(Slackのユーザー名) :string(50)       not null
-#  title(メモのタイトル)     :string(255)      not null
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
+#  id                                 :bigint           not null, primary key
+#  content(メモの本文)                :text(65535)      not null
+#  poster_user_key(Slackの投稿者のID) :string(255)      not null
+#  slack_ts(Slackの投稿時刻)          :string(255)      not null
+#  title(メモのタイトル)              :string(255)      not null
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#
+# Indexes
+#
+#  index_memos_on_poster_user_key  (poster_user_key)
+#  index_memos_on_slack_ts         (slack_ts) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_memos_poster_user_key  (poster_user_key => posters.user_key)
 #
 class Memo < ApplicationRecord
   validates :title, presence: true
   validates :content, presence: true
-  validates :poster, presence: true, length: { maximum: 50 }
+  validates :slack_ts, presence: true, uniqueness: true
+  belongs_to :poster,
+             class_name: 'Poster',
+             foreign_key: 'poster_user_key',
+             primary_key: 'user_key',
+             inverse_of: :memos
   has_many :comments, dependent: :destroy
   has_many :memo_tags, dependent: :destroy
   has_many :tags, through: :memo_tags

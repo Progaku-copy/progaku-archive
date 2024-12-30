@@ -5,7 +5,7 @@ class MemosController < ApplicationController
   def index
     @memos = \
       Memo::Query.call(
-        filter_collection: Memo.preload(:tags),
+        filter_collection: Memo.preload(:tags).joins(:poster),
         params: params
       )
   rescue TypeError
@@ -14,8 +14,8 @@ class MemosController < ApplicationController
 
   # GET /memos/:id
   def show
-    @memo = Memo.preload(:tags).find(params[:id])
-    @comments = @memo.comments.order(id: :desc)
+    @memo = Memo.preload(:tags).joins(:poster).find(params[:id])
+    @comments = @memo.comments.joins(:poster).order(id: :desc)
   end
 
   # POST /memos
@@ -50,6 +50,6 @@ class MemosController < ApplicationController
   private
 
   def memo_params
-    params.require(:memo).permit(:title, :content, :poster, tag_ids: [])
+    params.require(:memo).permit(:title, :content, :poster_user_key, :slack_ts, tag_ids: [])
   end
 end

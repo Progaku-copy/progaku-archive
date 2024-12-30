@@ -4,12 +4,22 @@
 #
 # Table name: memos
 #
-#  id                        :bigint           not null, primary key
-#  content(メモの本文)       :text(65535)      not null
-#  poster(Slackのユーザー名) :string(50)       not null
-#  title(メモのタイトル)     :string(255)      not null
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
+#  id                                 :bigint           not null, primary key
+#  content(メモの本文)                :text(65535)      not null
+#  poster_user_key_user_key(Slackの投稿者のID) :string(255)      not null
+#  slack_ts(Slackの投稿時刻)          :string(255)      not null
+#  title(メモのタイトル)              :string(255)      not null
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#
+# Indexes
+#
+#  index_memos_on_poster_user_key_user_key  (poster_user_key_user_key)
+#  index_memos_on_slack_ts         (slack_ts) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_memos_poster_user_key_user_key  (poster_user_key_user_key => poster_user_keys.user_key)
 #
 RSpec.describe Memo do
   let(:memo) { build(:memo) }
@@ -65,35 +75,24 @@ RSpec.describe Memo do
       end
     end
 
-    context 'posterが空文字の場合' do
-      before { memo.poster = '' }
+    context 'poster_user_keyが空文字の場合' do
+      before { memo.poster_user_key = '' }
 
       it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
         aggregate_failures do
           memo.valid?
-          expect(memo.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
+          expect(memo.errors.full_messages).to eq ['SlackのユーザーIDを入力してください']
         end
       end
     end
 
-    context 'posterがnilの場合' do
-      before { memo.poster = nil }
+    context 'poster_user_keyがnilの場合' do
+      before { memo.poster_user_key = nil }
 
       it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
         aggregate_failures do
           expect(memo).not_to be_valid
-          expect(memo.errors.full_messages).to eq ['Slackでの投稿者名を入力してください']
-        end
-      end
-    end
-
-    context 'posterが50文字以上の場合' do
-      before { memo.poster = 'a' * 51 }
-
-      it 'valid?メソッドがfalseを返し、エラーメッセージが格納される' do
-        aggregate_failures do
-          expect(memo).not_to be_valid
-          expect(memo.errors.full_messages).to eq ['Slackでの投稿者名は50文字以内で入力してください']
+          expect(memo.errors.full_messages).to eq ['SlackのユーザーIDを入力してください']
         end
       end
     end
@@ -182,11 +181,14 @@ RSpec.describe Memo do
 
     context 'ページネーション機能のテスト' do
       before do
+        poster = create(:poster)
+
         memos_data = Array.new(20) do
           {
             title: Faker::Lorem.sentence(word_count: 3),
             content: Faker::Lorem.paragraph(sentence_count: 5),
-            poster: Faker::Name.name,
+            poster_user_key: poster.user_key,
+            slack_ts: Faker::Number.decimal(l_digits: 10, r_digits: 6),
             created_at: Time.current,
             updated_at: Time.current
           }

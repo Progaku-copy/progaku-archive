@@ -14,10 +14,13 @@ ActiveRecord::Schema[7.2].define(version: 0) do
   create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "memo_id", null: false, comment: "メモID"
     t.string "content", limit: 1024, null: false, comment: "内容"
-    t.string "poster", limit: 50, null: false, comment: "Slackのユーザー名"
+    t.string "poster_user_key", null: false, comment: "Slackの投稿者のID"
+    t.string "slack_parent_ts", null: false, comment: "Slackの親メッセージの投稿時刻"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["memo_id"], name: "index_comments_on_memo_id"
+    t.index ["poster_user_key"], name: "index_comments_on_poster_user_key"
+    t.index ["slack_parent_ts"], name: "index_comments_on_slack_parent_ts", unique: true
   end
 
   create_table "memo_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -33,9 +36,21 @@ ActiveRecord::Schema[7.2].define(version: 0) do
   create_table "memos", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "title", null: false, comment: "メモのタイトル"
     t.text "content", null: false, comment: "メモの本文"
-    t.string "poster", limit: 50, null: false, comment: "Slackのユーザー名"
+    t.string "poster_user_key", null: false, comment: "Slackの投稿者のID"
+    t.string "slack_ts", null: false, comment: "Slackの投稿時刻"
     t.timestamp "created_at", null: false
     t.timestamp "updated_at", null: false
+    t.index ["poster_user_key"], name: "index_memos_on_poster_user_key"
+    t.index ["slack_ts"], name: "index_memos_on_slack_ts", unique: true
+  end
+
+  create_table "posters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "user_key", null: false, comment: "slack上でのuser.id"
+    t.string "display_name", comment: "slack上での表示名"
+    t.string "real_name", comment: "slack上での本名"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_key"], name: "index_posters_on_user_key", unique: true
   end
 
   create_table "tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -57,6 +72,8 @@ ActiveRecord::Schema[7.2].define(version: 0) do
   end
 
   add_foreign_key "comments", "memos", name: "fk_comments_memo_id"
+  add_foreign_key "comments", "posters", column: "poster_user_key", primary_key: "user_key", name: "fk_comments_poster_user_key"
   add_foreign_key "memo_tags", "memos", name: "fk_memo_tags_memo_id"
   add_foreign_key "memo_tags", "tags", name: "fk_memo_tags_tag_id"
+  add_foreign_key "memos", "posters", column: "poster_user_key", primary_key: "user_key", name: "fk_memos_poster_user_key"
 end
