@@ -22,11 +22,15 @@ class Poster < ApplicationRecord
 
   # Slack APIから取得したユーザー情報からdisplay_nameとreal_nameを取得し、Posterインスタンスを生成する
   # @param posters [Array<Hash>] Slack APIから取得したユーザー情報
-  # @return [Array<Poster>] Posterインスタンスの配列
-  def self.build_from_slack_posters(posters)
+  # @return true: Posterの取り込みに成功, false: Posterの取り込みに失敗
+
+  # rubocop:disable Metrics/MethodLength
+  def self.build_from_slack_posters
+    result = SlackApiClient.fetch_slack_users
+    posters = result['members']
     default_name = 'unknown'
 
-    posters.filter_map do |poster|
+    poster_params = posters.filter_map do |poster|
       next if poster['id'].blank?
 
       new(
@@ -35,5 +39,11 @@ class Poster < ApplicationRecord
         real_name: poster['real_name'].presence || default_name
       )
     end
+    Poster.import! poster_params, on_duplicate_key_update: %i[display_name real_name]
+    true
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.debug e.message
+    false
   end
+  # rubocop:enable Metrics/MethodLength
 end

@@ -34,66 +34,6 @@ class Memo < ApplicationRecord
   has_many :memo_tags, dependent: :destroy
   has_many :tags, through: :memo_tags
 
-  module SlackImport
-    class << self
-      # Slackの投稿情報からメモ(Slackの投稿)、コメント(Slackのスレッド)をインポートする
-      # @param channels_data [Array<SlackApiClient::SlackPost>] Slackの投稿情報
-      # @return [void]
-      # @raise [StandardError] インポートに失敗した場合
-      def import_from_slack_posts(channels_data)
-        ActiveRecord::Base.transaction do
-          archive_memo_params = build_archive_memo(channels_data)
-          Memo.import archive_memo_params, on_duplicate_key_update: %i[title content]
-
-          memo_tag_params = build_archive_memo_tags(channels_data)
-          MemoTag.import memo_tag_params, on_duplicate_key_update: %i[memo_id tag_id]
-
-          comment_params = Comment.build_archive_comments(channels_data)
-          Comment.import comment_params, on_duplicate_key_update: %i[content] if comment_params.present?
-        end
-      rescue StandardError => e
-        Rails.logger.error "Failed to import Slack posts: #{e.message}"
-        raise
-      end
-
-      # アーカイブ対象のメモのHashを生成する
-      # @param channels_data [Array<SlackApiClient::SlackPost>] Slackの投稿情報
-      # @return [Array<Hash>] アーカイブ対象のメモ情報
-      def build_archive_memo(channels_data)
-        channels_data.map do |post|
-          {
-            title: post.post_text[0..20],
-            content: post.post_text,
-            poster_user_key: post.poster_user_key,
-            slack_ts: post.ts
-          }
-        end
-      end
-
-      # アーカイブ対象のメモとタグの関連付けのHashを生成する
-      # @param channels_data [Array<SlackApiClient::SlackPost>] Slackの投稿情報
-      # @return [Array<Hash>] アーカイブ対象のメモとタグの関連付け情報
-      def build_archive_memo_tags(channels_data)
-        ts_values = channels_data.map(&:ts)
-        memo_ids = Memo.where(slack_ts: ts_values).pluck(:slack_ts, :id)
-
-        memo_ids.map do |slack_ts, memo_id|
-          {
-            memo_id: memo_id,
-            tag_id: find_tag_id(slack_ts, channels_data)
-          }
-        end
-      end
-
-      # Slackの投稿情報からタグIDを取得する
-      # @param target_ts [String] Slackの投稿時刻
-      # @param channels_data [Array<SlackApiClient::SlackPost>] Slackの投稿情報
-      def find_tag_id(target_ts, channels_data)
-        channels_data.find { |post| post.ts == target_ts }&.tag_id
-      end
-    end
-  end
-
   module Query
     FILTERS = %i[TitleFilter ContentFilter OrderFilter TagFilter].freeze
     private_constant :FILTERS
