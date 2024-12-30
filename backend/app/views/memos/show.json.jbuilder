@@ -15,7 +15,7 @@ json.memo do
 
   json.comments @comments do |comment|
     json.id comment.id
-    json.content comment.conte
+    json.content comment.content
     json.poster(comment.poster.display_name.presence || comment.poster.real_name)
     json.created_at comment.created_at
     json.memo_id comment.memo_id
