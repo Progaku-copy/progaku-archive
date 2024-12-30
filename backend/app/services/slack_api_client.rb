@@ -31,8 +31,9 @@ module SlackApiClient
   # Slackのスレッド情報を格納する構造体
   # @!attribute thread_text [String] スレッド投稿のテキスト
   # @!attribute poster_user_key [String] 投稿者のユーザーID
-  SlackThread = Struct.new(:thread_text, :poster_user_key, keyword_init: true)
-
+  # @!attribute parent_ts [String] スレッドの親投稿のタイムスタンプ
+  SlackThread = Struct.new(:thread_text, :poster_user_key, :parent_ts, keyword_init: true)
+  
   class << self
     # Slack API: ユーザー一覧を取得
     # @return [Hash] APIレスポンス
@@ -74,11 +75,10 @@ module SlackApiClient
       results = fetch_data(SLACK_THREAD_BASE_URL, { channel: channel_id, ts: thread_ts })
 
       results['messages'].filter_map do |thread|
-        next if thread['reply_count']
-
         SlackThread.new(
           thread_text: thread['text'],
-          poster_user_key: thread['user']
+          poster_user_key: thread['user'],
+          parent_ts: thread['thread_ts']
         )
       end
     end

@@ -47,12 +47,10 @@ class Memo < ApplicationRecord
 
           memo_tag_params = build_archive_memo_tags(channels_data)
 
-          MemoTag.import memo_tag_params, on_duplicate_key_ignore: %i[post_id tag_id]
+          MemoTag.import memo_tag_params, on_duplicate_key_update: %i[memo_id tag_id]
 
           comment_params = Comment.build_archive_comments(channels_data)
-          if comment_params.present?
-            Comment.import comment_params, on_duplicate_key_ignore: %i[content poster_user_key memo_id]
-          end
+          Comment.import comment_params, on_duplicate_key_update: %i[content] if comment_params.present?
         end
       rescue StandardError => e
         Rails.logger.error "Failed to import Slack posts: #{e.message}"
