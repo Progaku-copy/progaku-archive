@@ -33,7 +33,11 @@ module SlackApiClient
   # @!attribute poster_user_key [String] 投稿者のユーザーID
   # @!attribute parent_ts [String] スレッドの親投稿のタイムスタンプ
   SlackThread = Struct.new(:thread_text, :poster_user_key, :parent_ts, keyword_init: true)
-  
+
+  # ユーザーIDとユーザー名のマッピングを保持するクラス変数
+  # メンションをユーザー名に置換する際に使用
+  @user_mapping = nil
+
   class << self
     # Slack API: ユーザー一覧を取得
     # @return [Hash] APIレスポンス
@@ -44,6 +48,8 @@ module SlackApiClient
     # Slack API: チャンネルごとの投稿データを取得
     # @return [Array<SlackPost>] アーカイブ対象の投稿データ
     def fetch_channels_data
+      # ユーザーIDとユーザー名のマッピングをリセット
+      reset_user_mapping
       SLACK_CHANNELS.flat_map { |channel| fetch_archive_posts(channel) }
     end
 
@@ -57,7 +63,7 @@ module SlackApiClient
         next unless post['reactions']&.any? { |reaction| reaction['name'].include?(ARCHIVE_REACTION) }
 
         SlackPost.new(
-          post_text: post['text'],
+          post_text: replace_user_mentions(post['text']),
           poster_user_key: post['user'],
           ts: post['ts'],
           tag_id: channel[:tag_id],
@@ -76,7 +82,7 @@ module SlackApiClient
 
       results['messages'].filter_map do |thread|
         SlackThread.new(
-          thread_text: thread['text'],
+          thread_text: replace_user_mentions(thread['text']),
           poster_user_key: thread['user'],
           parent_ts: thread['thread_ts']
         )
@@ -149,6 +155,30 @@ module SlackApiClient
       error_message = "HTTP Error: #{response.message} (HTTP #{response.code})"
       Rails.logger.error(error_message)
       raise error_message
+    end
+
+    # ユーザーIDとユーザー名のマッピングを取得
+    # @return [Hash] ユーザーIDとユーザー名のマッピング
+    def user_mapping
+      @user_mapping ||= Poster.all.each_with_object({}) do |poster, hash|
+        hash[poster.user_key] = poster.display_name.presence || poster.real_name
+      end
+    end
+
+    # ユーザーIDとユーザー名のマッピングをリセット
+    # 取り込み処理の前に呼び出す
+    def reset_user_mapping
+      @user_mapping = nil
+    end
+
+    # ユーザーメンションをユーザー名に置換
+    # @param text [String] テキスト
+    # @return [String] 置換後のテキスト (ユーザー名に置換)
+    def replace_user_mentions(text)
+      text.gsub(/<@(\w+)>/) do |_match|
+        user_id = Regexp.last_match(1)
+        "@#{user_mapping[user_id] || 'unknown'}" # user_mapping を呼び出して user_id を検索
+      end
     end
   end
 end
