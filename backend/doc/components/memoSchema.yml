@@ -60,6 +60,9 @@ components:
         content:
           type: string
           example: コメントの内容
+        poster:
+            type: string
+            example: Slackでの投稿者名
         created_at:
           type: string
           format: date-time
