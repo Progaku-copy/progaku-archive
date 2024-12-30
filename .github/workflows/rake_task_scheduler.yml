@@ -1,0 +1,29 @@
+name: Rake Task Scheduler
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # UTC時間で毎月1日の15時に実行
+  workflow_dispatch:  # 手動実行を有効化
+
+jobs:
+  run-rake-task:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリのチェックアウト
+        uses: actions/checkout@v3
+
+      - name: Rubyのセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'  # 使用するRubyのバージョンを指定
+
+      - name: 依存関係のインストール
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: rakeタスクの実行
+        run: |
+          bundle exec rake slack_importer:save_posters
+          bundle exec rake slack_importer:save_memos
