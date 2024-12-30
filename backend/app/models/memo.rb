@@ -41,12 +41,11 @@ class Memo < ApplicationRecord
       # @return [void]
       # @raise [StandardError] インポートに失敗した場合
       def import_from_slack_posts(channels_data)
-        archive_memo_params = build_archive_memo(channels_data)
         ActiveRecord::Base.transaction do
+          archive_memo_params = build_archive_memo(channels_data)
           Memo.import archive_memo_params, on_duplicate_key_update: %i[title content]
 
           memo_tag_params = build_archive_memo_tags(channels_data)
-
           MemoTag.import memo_tag_params, on_duplicate_key_update: %i[memo_id tag_id]
 
           comment_params = Comment.build_archive_comments(channels_data)

@@ -52,6 +52,6 @@ class Comment < ApplicationRecord
           slack_parent_ts: thread.parent_ts
         }
       end
-    end
+    end.compact
   end
 end
