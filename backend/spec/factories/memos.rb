@@ -25,8 +25,8 @@ FactoryBot.define do
   factory :memo do
     title { Faker::Lorem.sentence(word_count: 3) }
     content { Faker::Lorem.paragraph(sentence_count: 5) }
-    poster { Faker::Name.name }
-
+    slack_ts { Faker::Number.decimal(l_digits: 10, r_digits: 6) }
+    poster
     trait :with_tags do
       after :create do |memo|
         create_list(:memo_tag, 3, memo: memo)

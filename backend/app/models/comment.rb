@@ -25,7 +25,7 @@
 #
 class Comment < ApplicationRecord
   validates :content, presence: true, length: { maximum: 1024 }
-  validates :poster, length: { maximum: 50 }
+  validates :slack_parent_ts, presence: true
   belongs_to :memo
   belongs_to :poster,
              class_name: 'Poster',

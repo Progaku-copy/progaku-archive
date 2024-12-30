@@ -24,7 +24,7 @@
 class Memo < ApplicationRecord
   validates :title, presence: true
   validates :content, presence: true
-  validates :poster, length: { maximum: 50 }
+  validates :slack_ts, presence: true, uniqueness: true
   belongs_to :poster,
              class_name: 'Poster',
              foreign_key: 'poster_user_key',

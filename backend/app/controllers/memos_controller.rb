@@ -50,6 +50,6 @@ class MemosController < ApplicationController
   private
 
   def memo_params
-    params.require(:memo).permit(:title, :content, :poster_user_key, tag_ids: [])
+    params.require(:memo).permit(:title, :content, :poster_user_key, :slack_ts, tag_ids: [])
   end
 end

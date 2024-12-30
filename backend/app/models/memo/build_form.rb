@@ -36,7 +36,8 @@ class Memo
       @memo ||= Memo.new(
         title: params[:title],
         content: params[:content],
-        poster: params[:poster]
+        poster_user_key: params[:poster_user_key],
+        slack_ts: params[:slack_ts]
       )
     end
 

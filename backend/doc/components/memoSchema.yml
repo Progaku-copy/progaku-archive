@@ -54,6 +54,9 @@ components:
           type: integer
           format: int64
           example: 1
+        poster:
+            type: string
+            example: Slackでの投稿者名
         content:
           type: string
           example: コメントの内容

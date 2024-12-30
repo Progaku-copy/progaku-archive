@@ -27,7 +27,8 @@
 FactoryBot.define do
   factory :comment do
     content { 'sample_comment' }
-    poster { Faker::Name.name }
+    slack_parent_ts { Faker::Number.decimal(l_digits: 10, r_digits: 6) }
     memo
+    poster
   end
 end

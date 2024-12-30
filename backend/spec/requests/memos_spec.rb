@@ -3,6 +3,8 @@
 RSpec.describe 'MemosController' do
   let!(:user) { create(:user) }
 
+  let_it_be(:poster) { create(:poster) }
+
   describe 'GET /memos' do
     # そこそこ重いSQLを発行するので、一回だけ呼ばれるようにしたい。
     # ref: https://github.com/test-prof/test-prof/blob/master/docs/recipes/let_it_be.md
@@ -11,7 +13,8 @@ RSpec.describe 'MemosController' do
         {
           title: Faker::Lorem.sentence(word_count: 3),
           content: Faker::Lorem.paragraph(sentence_count: 5),
-          poster: Faker::Name.name,
+          poster_user_key: poster.user_key,
+          slack_ts: Faker::Number.decimal(l_digits: 10, r_digits: 6),
           created_at: Time.current,
           updated_at: Time.current
         }
@@ -161,7 +164,8 @@ RSpec.describe 'MemosController' do
       let(:valid_form_params) do
         { title: Faker::Lorem.sentence(word_count: 3),
           content: Faker::Lorem.paragraph(sentence_count: 5),
-          poster: Faker::Name.name,
+          poster_user_key: poster.user_key,
+          slack_ts: Faker::Number.decimal(l_digits: 10, r_digits: 6),
           tag_ids: tag_ids }
       end
 
@@ -182,7 +186,7 @@ RSpec.describe 'MemosController' do
     end
 
     context 'ログインしていてバリデーションエラーになる場合' do
-      let(:empty_memo_params) { { title: '', content: '', poster: '', tag_ids: } }
+      let(:empty_memo_params) { { title: '', content: '', poster_user_key: '', tag_ids: } }
 
       before { sign_in(user) }
 
@@ -216,7 +220,6 @@ RSpec.describe 'MemosController' do
       let(:params) do
         { title: existing_memo.title,
           content: '新しいコンテンツ',
-          poster: existing_memo.poster,
           tag_ids: [existing_tags.second.id] }
       end
 
@@ -244,7 +247,7 @@ RSpec.describe 'MemosController' do
       let(:params) do
         { title: existing_memo.title,
           content: '',
-          poster: existing_memo.poster,
+          poster_user_key: existing_memo.poster_user_key,
           tag_ids: [] }
       end
 
@@ -267,7 +270,7 @@ RSpec.describe 'MemosController' do
       let(:params) do
         { title: '新しいタイトル',
           content: existing_memo.content,
-          poster: existing_memo.poster,
+          poster_user_key: existing_memo.poster_user_key,
           tag_ids: [] }
       end
 
@@ -290,7 +293,7 @@ RSpec.describe 'MemosController' do
       let(:params) do
         { title: '',
           content: existing_memo.content,
-          poster: existing_memo.poster,
+          poster_user_key: existing_memo.poster_user_key,
           tag_ids: [] }
       end
 

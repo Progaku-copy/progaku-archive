@@ -17,8 +17,8 @@
 #
 FactoryBot.define do
   factory :poster do
-    user_key { SecureRandom.uuid } # 一意の値を生成
-    display_name { Faker::Name.name  }
+    user_key { Faker::Base.unique.bothify('U###D##???#') }
+    display_name { Faker::Name.name }
     real_name { Faker::Name.name }
   end
 end
