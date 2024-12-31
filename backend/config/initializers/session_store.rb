@@ -1,1 +1,5 @@
-Rails.application.config.session_store :cookie_store, expire_after: 6.hours, key: '_progaku_archive_session', same_site: :none
+Rails.application.config.session_store :cookie_store,                           key: '_progaku_archive_session',
+                                       expire_after: 6.hours,
+                                       http_only: true,
+                                       secure: Rails.env.production? ? true : false,
+                                       same_site: :none
