@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  backend:
+    container_name: pa_backend
+    build:
+      context: .
+      dockerfile: ./infra/backend/Dockerfile
+    volumes:
+      - ./backend:/usr/src/app
+      - /etc/letsencrypt/live/progaku-archive.work/privkey.pem:/etc/letsencrypt/live/progaku-archive.work/privkey.pem
+      - /etc/letsencrypt/live/progaku-archive.work/fullchain.pem:/etc/letsencrypt/live/progaku-archive.work/fullchain.pem
+    stdin_open: true
+    tty: true
+    env_file:
+      - ./infra/env/backend-prod.env
+    ports:
+      - 80:8080
+      - 443:443
+    command: sh -c "rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb"
