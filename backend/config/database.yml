@@ -12,6 +12,8 @@
 default: &default
   adapter: mysql2
   encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
+  charset: utf8mb4
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
@@ -37,7 +39,11 @@ test:
 # URL environment variable explicitly:
 #
 production:
+  <<: *default
   url: <%= ENV["MY_APP_DATABASE_URL"] %>
+  encoding: utf8mb4
+  collation: utf8mb4_unicode_ci
+  charset: utf8mb4
 #
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
