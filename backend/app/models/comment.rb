@@ -46,7 +46,7 @@ class Comment < ApplicationRecord
 
       thread_list.map do |thread|
         {
-          content: thread.thread_text,
+          content: thread.thread_text&.slice(0, 1024), # 1024文字に切り捨て
           poster_user_key: thread.poster_user_key,
           memo_id: memo_id,
           slack_parent_ts: thread.parent_ts

@@ -6,6 +6,7 @@ require 'uri'
 
 # Slack APIクライアントモジュール
 # Slack APIを使用して、ユーザー、チャンネルの投稿、スレッド情報を取得します。
+# rubocop:disable Metrics/ModuleLength
 module SlackApiClient
   # Slack APIのエンドポイントURLを定数として定義
   SLACK_USER_URL = 'https://slack.com/api/users.list' # ユーザー一覧取得用
@@ -69,6 +70,23 @@ module SlackApiClient
           tag_id: channel[:tag_id],
           channel_id: channel[:channel_id],
           thread_ts: post['thread_ts']
+        )
+      end
+    end
+
+    # Slack API: ファイルで取り込む際のデータをフォーマットする
+    # @param data [Hash] チャンネル情報 (channel_id, tag_idなどを含む)
+    def format_archive_posts(data)
+      data[:messages].filter_map do |post|
+        next if post[:text].to_s.length <= 30
+
+        SlackPost.new(
+          post_text: replace_user_mentions(post[:text]),
+          poster_user_key: post[:user],
+          ts: post[:ts],
+          tag_id: 15,
+          channel_id: 'C03BPRB3UDP',
+          thread_ts: post[:thread_ts]
         )
       end
     end
@@ -182,3 +200,4 @@ module SlackApiClient
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength

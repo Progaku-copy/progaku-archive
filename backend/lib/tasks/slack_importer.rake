@@ -10,6 +10,15 @@ namespace :slack_importer do
     end
   end
 
+  task save_memos_from_file: :environment do
+    if Memo::SlackImporter.save_for_file
+      puts 'メモの取り込みに成功しました'
+    else
+      puts 'メモの取り込みに失敗しました'
+      exit(1)
+    end
+  end
+
   task save_posters: :environment do
     if Poster.build_from_slack_posters
       puts 'ユーザーの取り込みに成功しました'
