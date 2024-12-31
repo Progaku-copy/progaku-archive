@@ -26,6 +26,11 @@ module Backend
     config.i18n.default_locale = :ja
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.{rb,yml}').to_s]
     config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, key: '_progaku_archive_session', same_site: :none,secure: Rails.env.production?
+    config.middleware.use ActionDispatch::Session::CookieStore,
+                          key: '_progaku_archive_session',
+                          expire_after: 6.hours,
+                          http_only: true,
+                          secure: Rails.env.production?, # 本番環境でのみtrue
+                          same_site: Rails.env.production? ? :none : :lax # 本番ではnone、それ以外ではlax
   end
 end
