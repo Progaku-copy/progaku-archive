@@ -27,6 +27,9 @@ ClassLength:
   CountComments: false
   Max: 100
 
+Layout/LineLength:
+    Max: 135
+
 # RSpec/ContextWordingを無効
 RSpec/ContextWording:
   Enabled: false
