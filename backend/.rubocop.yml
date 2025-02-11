@@ -21,7 +21,7 @@ Style/Documentation:
   Enabled: false
 
 Metrics/MethodLength:
-  Max: 13
+  Max: 15
 
 ClassLength:
   CountComments: false

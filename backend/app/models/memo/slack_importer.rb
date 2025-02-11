@@ -15,7 +15,6 @@ class Memo
 
           memo_tag_params = build_archive_memo_tags(channels_data)
           MemoTag.import! memo_tag_params, on_duplicate_key_update: %i[memo_id tag_id]
-
           comment_params = Comment.build_archive_comments(channels_data)
           Comment.import! comment_params, on_duplicate_key_update: %i[content] if comment_params.present?
           true

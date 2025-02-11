@@ -32,7 +32,7 @@ module SlackApiClient
   # @!attribute thread_text [String] スレッド投稿のテキスト
   # @!attribute poster_user_key [String] 投稿者のユーザーID
   # @!attribute parent_ts [String] スレッドの親投稿のタイムスタンプ
-  SlackThread = Struct.new(:thread_text, :poster_user_key, :parent_ts, keyword_init: true)
+  SlackThread = Struct.new(:thread_text, :poster_user_key, :parent_ts, :ts, keyword_init: true)
 
   # ユーザーIDとユーザー名のマッピングを保持するクラス変数
   # メンションをユーザー名に置換する際に使用
@@ -81,10 +81,13 @@ module SlackApiClient
       results = fetch_data(SLACK_THREAD_BASE_URL, { channel: channel_id, ts: thread_ts })
 
       results['messages'].filter_map do |thread|
+        next if thread['text'].blank?
+
         SlackThread.new(
           thread_text: replace_user_mentions(thread['text']),
           poster_user_key: thread['user'],
-          parent_ts: thread['thread_ts']
+          parent_ts: thread['thread_ts'],
+          ts: thread['ts']
         )
       end
     end
