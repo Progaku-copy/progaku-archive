@@ -13,9 +13,9 @@ components:
         content:
           type: string
           example: メモの内容
-        poster_user_key:
+        poster:
             type: string
-            example: SlackのユーザーID
+            example: Slackでの投稿者名
         slack_ts:
             type: string
             example: Slackのタイムスタンプ

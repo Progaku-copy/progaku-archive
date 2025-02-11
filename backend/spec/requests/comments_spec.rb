@@ -10,7 +10,8 @@ RSpec.describe 'CommentsController' do
       let(:params) do
         { content: Faker::Lorem.paragraph(sentence_count: 3),
           poster_user_key: poster.user_key,
-          slack_parent_ts: Faker::Number.decimal(l_digits: 10, r_digits: 6) }
+          slack_parent_ts: Faker::Number.decimal(l_digits: 10, r_digits: 6),
+          slack_ts: Faker::Number.decimal(l_digits: 10, r_digits: 6) }
       end
 
       before { sign_in(user) }

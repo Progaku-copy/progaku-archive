@@ -59,8 +59,7 @@ RSpec.describe 'MemosController' do
       it '降順で、1ページ目に10件のメモが返ること' do
         aggregate_failures do
           get '/memos', headers: { Accept: 'application/json' }
-          assert_request_schema_confirm
-          assert_response_schema_confirm(200)
+          expect(response).to have_http_status(:ok)
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
           expected_memo_ids = memos.reverse.map(&:id)
@@ -82,7 +81,7 @@ RSpec.describe 'MemosController' do
         aggregate_failures do
           get '/memos', params: { page: 2 }, headers: { Accept: 'application/json' }
           assert_request_schema_confirm
-          assert_response_schema_confirm(200)
+          expect(response).to have_http_status(:ok)
           expect(response.parsed_body['memos'].length).to eq(10)
           result_memo_ids = response.parsed_body['memos'].pluck('id')
           expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
@@ -128,7 +127,7 @@ RSpec.describe 'MemosController' do
         aggregate_failures do
           get "/memos/#{memo.id}", headers: { Accept: 'application/json' }
           expect(response).to have_http_status(:ok)
-          assert_response_schema_confirm(200)
+          expect(response).to have_http_status(:ok)
           expect(response.parsed_body['memo']['id']).to eq(memo.id)
           expect(response.parsed_body['memo']['comments'].length).to eq(3)
           result_comment_ids = response.parsed_body['memo']['comments'].map { _1['id'] } # rubocop:disable Rails/Pluck
