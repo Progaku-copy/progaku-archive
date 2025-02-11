@@ -35,6 +35,6 @@ class CommentsController < ApplicationController
   private
 
   def comment_params
-    params.require(:comment).permit(:content, :poster_user_key, :slack_parent_ts)
+    params.require(:comment).permit(:content, :poster_user_key, :slack_parent_ts, :slack_ts)
   end
 end
