@@ -13,7 +13,7 @@
 ActiveRecord::Schema[7.2].define(version: 0) do
   create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "memo_id", null: false, comment: "メモID"
-    t.string "content", limit: 2048, null: false, comment: "内容"
+    t.text "content", null: false, comment: "内容"
     t.string "poster_user_key", null: false, comment: "Slackの投稿者のID"
     t.string "slack_parent_ts", null: false, comment: "Slackの親メッセージの投稿時刻"
     t.string "slack_ts", null: false, comment: "Slackの投稿時刻"
