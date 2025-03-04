@@ -5,7 +5,7 @@
 # Table name: comments
 #
 #  id                                             :bigint           not null, primary key
-#  content(内容)                                  :string(1024)     not null
+#  content(内容)                                  :text(65535)      not null
 #  poster_user_key(Slackの投稿者のID)             :string(255)      not null
 #  slack_parent_ts(Slackの親メッセージの投稿時刻) :string(255)      not null
 #  slack_ts(Slackの投稿時刻)                      :string(255)      not null
@@ -26,7 +26,7 @@
 #  fk_comments_poster_user_key  (poster_user_key => posters.user_key)
 #
 class Comment < ApplicationRecord
-  validates :content, presence: true, length: { maximum: 2048 }
+  validates :content, presence: true
   validates :slack_parent_ts, presence: true
   belongs_to :memo
   belongs_to :poster,

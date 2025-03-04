@@ -5,7 +5,7 @@
 # Table name: comments
 #
 #  id                                             :bigint           not null, primary key
-#  content(内容)                                  :string(1024)     not null
+#  content(内容)                                  :text(65535)      not null
 #  poster_user_key(Slackの投稿者のID)             :string(255)      not null
 #  slack_parent_ts(Slackの親メッセージの投稿時刻) :string(255)      not null
 #  slack_ts(Slackの投稿時刻)                      :string(255)      not null
@@ -57,25 +57,6 @@ RSpec.describe Comment do
           expect(comment).not_to be_valid
           expect(comment.errors.full_messages).to eq ['内容を入力してください']
         end
-      end
-    end
-
-    context 'contentが1025文字の場合' do
-      before { comment.content = Faker::Lorem.characters(number: 1025) }
-
-      it 'valid?メソッドがfalseを返し、errorsに「内容は1024文字以内で入力してください」と格納されること' do
-        aggregate_failures do
-          expect(comment).not_to be_valid
-          expect(comment.errors.full_messages).to eq ['内容は1024文字以内で入力してください']
-        end
-      end
-    end
-
-    context 'contentが1024文字の場合' do
-      before { comment.content = Faker::Lorem.characters(number: 1024) }
-
-      it 'valid?メソッドがtrueを返すこと' do
-        expect(comment).to be_valid
       end
     end
 
