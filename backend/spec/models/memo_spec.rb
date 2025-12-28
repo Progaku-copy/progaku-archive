@@ -166,6 +166,8 @@ RSpec.describe Memo do
     end
 
     context '並び替え機能のテスト' do
+      before { memos }
+
       it '昇順機能が正しく機能していること' do
         result = Memo::Query.call(filter_collection: described_class.all, params: { order: 'asc' })
         expect(result[:memos].pluck(:slack_ts)).to eq(%w[1000.000000 2000.000000 3000.000000])

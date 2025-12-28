@@ -61,14 +61,15 @@ RSpec.describe 'MemosController' do
           get '/memos', headers: { Accept: 'application/json' }
           expect(response).to have_http_status(:ok)
           expect(response.parsed_body['memos'].length).to eq(10)
+          sorted_memos = memos.sort_by { |memo| memo.slack_ts.to_f }.reverse
           result_memo_ids = response.parsed_body['memos'].map { _1['id'] } # rubocop:disable Rails/Pluck
-          expected_memo_ids = memos.reverse.map(&:id)
+          expected_memo_ids = sorted_memos.map(&:id)
           result_memo_tags = response.parsed_body['memos'].map { _1['tags'] } # rubocop:disable Rails/Pluck
-          expected_memo_tags = memos.reverse.map do |memo|
+          expected_memo_tags = sorted_memos.map do |memo|
             memo.tags.map { |tag| { id: tag.id, name: tag.name } }
           end.as_json
-          expect(result_memo_ids).to eq(expected_memo_ids[0..9])
-          expect(result_memo_tags).to eq(expected_memo_tags[0..9])
+          expect(result_memo_ids).to eq(expected_memo_ids.first(10))
+          expect(result_memo_tags).to eq(expected_memo_tags.first(10))
           expect(response.parsed_body['total_page']).to eq(2)
         end
       end
@@ -83,10 +84,11 @@ RSpec.describe 'MemosController' do
           assert_request_schema_confirm
           expect(response).to have_http_status(:ok)
           expect(response.parsed_body['memos'].length).to eq(10)
+          sorted_memos = memos.sort_by { |memo| memo.slack_ts.to_f }.reverse
           result_memo_ids = response.parsed_body['memos'].pluck('id')
-          expected_memo_ids = memos.sort_by(&:id).reverse[10..19].map(&:id)
+          expected_memo_ids = sorted_memos[10..19].map(&:id)
           result_memo_tags = response.parsed_body['memos'].map { _1['tags'] } # rubocop:disable Rails/Pluck
-          expected_memo_tags = memos.reverse.map do |memo|
+          expected_memo_tags = sorted_memos.map do |memo|
             memo.tags.map { |tag| { id: tag.id, name: tag.name } }
           end.as_json
           expect(result_memo_ids).to eq(expected_memo_ids)
@@ -130,8 +132,9 @@ RSpec.describe 'MemosController' do
           expect(response).to have_http_status(:ok)
           expect(response.parsed_body['memo']['id']).to eq(memo.id)
           expect(response.parsed_body['memo']['comments'].length).to eq(3)
+          sorted_comments = comments.sort_by { |comment| comment.slack_ts.to_f }
           result_comment_ids = response.parsed_body['memo']['comments'].map { _1['id'] } # rubocop:disable Rails/Pluck
-          expected_comments_ids = comments.reverse.map(&:id)
+          expected_comments_ids = sorted_comments.map(&:id)
           expect(result_comment_ids).to eq(expected_comments_ids)
         end
       end
