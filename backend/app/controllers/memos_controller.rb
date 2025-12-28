@@ -15,7 +15,9 @@ class MemosController < ApplicationController
   # GET /memos/:id
   def show
     @memo = Memo.preload(:tags).joins(:poster).find(params[:id])
-    @comments = @memo.comments.joins(:poster).order(id: :desc)
+    @comments = @memo.comments
+                     .joins(:poster)
+                     .order(Arel.sql('CAST(comments.slack_ts AS DECIMAL(20,6)) ASC'))
   end
 
   # POST /memos

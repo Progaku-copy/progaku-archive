@@ -110,9 +110,9 @@ RSpec.describe Memo do
   describe 'Query::call(filter_collection:, params:)' do
     let(:memos) do
       [
-        create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１'),
-        create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２'),
-        create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ')
+        create(:memo, title: 'テスト タイトル１', content: 'テスト コンテンツ１', slack_ts: '1000.000000'),
+        create(:memo, title: 'テスト タイトル２', content: 'テスト コンテンツ２', slack_ts: '2000.000000'),
+        create(:memo, title: 'その他 タイトル', content: 'その他 コンテンツ', slack_ts: '3000.000000')
       ]
     end
 
@@ -166,15 +166,17 @@ RSpec.describe Memo do
     end
 
     context '並び替え機能のテスト' do
+      before { memos }
+
       it '昇順機能が正しく機能していること' do
         result = Memo::Query.call(filter_collection: described_class.all, params: { order: 'asc' })
-        expect(result[:memos]).to contain_exactly(memos[0], memos[1], memos[2])
+        expect(result[:memos].pluck(:slack_ts)).to eq(%w[1000.000000 2000.000000 3000.000000])
       end
 
       it 'デフォルトで降順機能が正しく機能されていること' do
         aggregate_failures do
           result = Memo::Query.call(filter_collection: described_class.all, params: {})
-          expect(result[:memos]).to contain_exactly(memos[2], memos[1], memos[0])
+          expect(result[:memos].pluck(:slack_ts)).to eq(%w[3000.000000 2000.000000 1000.000000])
         end
       end
     end
@@ -200,7 +202,7 @@ RSpec.describe Memo do
       it '指定したページ数のメモ、総数が取得できること' do
         aggregate_failures do
           result = Memo::Query.call(filter_collection: described_class.all, params: { page: 2 })
-          memo_relation = described_class.order(id: :desc).limit(10).offset(10)
+          memo_relation = described_class.order(Arel.sql('CAST(memos.slack_ts AS DECIMAL(20,6)) DESC')).limit(10).offset(10)
           expect(result[:memos].pluck('id')).to eq(memo_relation.pluck(:id))
           expect(result[:total_page]).to eq(2)
         end

@@ -58,9 +58,10 @@ module SlackApiClient
     # @return [Array<SlackPost>] アーカイブ対象の投稿データ
     def fetch_archive_posts(channel)
       response_data = fetch_data(SLACK_CHANNEL_BASE_URL, { channel: channel[:channel_id] })
+      force_import = channel[:force_import]
 
       response_data['messages'].filter_map do |post|
-        next unless post['reactions']&.any? { |reaction| reaction['name'].include?(ARCHIVE_REACTION) }
+        next unless archive_target_post?(force_import, post)
 
         SlackPost.new(
           post_text: replace_user_mentions(post['text']),
@@ -93,6 +94,14 @@ module SlackApiClient
     end
 
     private
+
+    def archive_target_post?(force_import, post)
+      force_import || reaction_attached?(post)
+    end
+
+    def reaction_attached?(post)
+      post['reactions']&.any? { |reaction| reaction['name'].include?(ARCHIVE_REACTION) }
+    end
 
     # APIリクエストを送信してレスポンスを取得
     # @param base_url [String] APIのエンドポイントURL
