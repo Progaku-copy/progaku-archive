@@ -35,6 +35,14 @@ class Comment < ApplicationRecord
              primary_key: 'user_key',
              inverse_of: :comments
 
+  def slack_posted_at
+    return if slack_ts.blank?
+
+    seconds, fractional = slack_ts.split('.')
+    fractional = fractional.to_s.ljust(6, '0')[0, 6]
+    Time.zone.at(seconds.to_i, fractional.to_i)
+  end
+
   # Slack APIから取得した投稿情報からアーカイブ対象のコメントのHashを生成する
   # @param channels_data [Array<SlackApiClient::SlackPost>] Slackの投稿情報
   # @return [Array<Hash>] アーカイブ対象のコメント情報

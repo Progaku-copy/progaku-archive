@@ -5,8 +5,7 @@ json.memos @memos[:memos] do |memo|
   json.title memo.title
   json.content memo.content
   json.poster(memo.poster.display_name.presence&.downcase == 'unknown' ? memo.poster.real_name : memo.poster.display_name)
-  json.created_at memo.created_at
-  json.updated_at memo.updated_at
+  json.slack_posted_at memo.slack_posted_at&.iso8601(6)
   json.tags memo.tags do |tag|
     json.id tag.id
     json.name tag.name
