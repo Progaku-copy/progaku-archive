@@ -11,47 +11,45 @@ RSpec.describe SlackApiClient do
       allow(described_class).to receive(:replace_user_mentions) { |text| text }
     end
 
-    context '通常チャンネル（リアクション必須）の場合' do
+    context '通常チャンネルでアーカイブリアクションが付いている場合' do
       let(:channel) { { channel_id: 'C000000001', tag_id: 1 } }
-
-      context 'アーカイブリアクションが付いているとき' do
-        let(:messages) do
-          [
-            {
-              'text' => 'Hello',
-              'user' => 'U123',
-              'ts' => '123.000',
-              'thread_ts' => nil,
-              'reactions' => [
-                {
-                  'name' => Rails.application.config.slack[:archive_reaction]
-                }
-              ]
-            }
-          ]
-        end
-
-        it '投稿を取り込む' do
-          expect(posts.length).to eq(1)
-        end
+      let(:messages) do
+        [
+          {
+            'text' => 'Hello',
+            'user' => 'U123',
+            'ts' => '123.000',
+            'thread_ts' => nil,
+            'reactions' => [
+              {
+                'name' => Rails.application.config.slack[:archive_reaction]
+              }
+            ]
+          }
+        ]
       end
 
-      context 'アーカイブリアクションが付いていないとき' do
-        let(:messages) do
-          [
-            {
-              'text' => 'Hello',
-              'user' => 'U123',
-              'ts' => '123.000',
-              'thread_ts' => nil,
-              'reactions' => []
-            }
-          ]
-        end
+      it '投稿を取り込む' do
+        expect(posts.length).to eq(1)
+      end
+    end
 
-        it '投稿をスキップする' do
-          expect(posts).to be_empty
-        end
+    context '通常チャンネルでアーカイブリアクションが付いていない場合' do
+      let(:channel) { { channel_id: 'C000000001', tag_id: 1 } }
+      let(:messages) do
+        [
+          {
+            'text' => 'Hello',
+            'user' => 'U123',
+            'ts' => '123.000',
+            'thread_ts' => nil,
+            'reactions' => []
+          }
+        ]
+      end
+
+      it '投稿をスキップする' do
+        expect(posts).to be_empty
       end
     end
 
