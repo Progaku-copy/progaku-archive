@@ -34,6 +34,14 @@ class Memo < ApplicationRecord
   has_many :memo_tags, dependent: :destroy
   has_many :tags, through: :memo_tags
 
+  def slack_posted_at
+    return if slack_ts.blank?
+
+    seconds, fractional = slack_ts.split('.')
+    fractional = fractional.to_s.ljust(6, '0')[0, 6]
+    Time.zone.at(seconds.to_i, fractional.to_i)
+  end
+
   module Query
     FILTERS = %i[TitleFilter ContentFilter OrderFilter TagFilter].freeze
     private_constant :FILTERS

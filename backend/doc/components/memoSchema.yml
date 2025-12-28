@@ -14,33 +14,26 @@ components:
           type: string
           example: メモの内容
         poster:
-            type: string
-            example: Slackでの投稿者名
-        slack_ts:
-            type: string
-            example: Slackのタイムスタンプ
-        created_at:
+          type: string
+          example: Slackでの投稿者名
+        slack_posted_at:
           type: string
           format: date-time
-          example: 2021-01-01T00:00:00.000Z
-        updated_at:
-          type: string
-          format: date-time
-          example: 2021-01-01T00:00:00.000Z
+          example: 2024-09-05T08:17:17.195549Z
         tags:
           type: array
           items:
             properties:
-                id:
-                    type: integer
-                    example: 1
-                name:
-                    type: string
-                    example: "タグの名前"
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: "タグの名前"
         comments:
           type: array
           items:
-            $ref: '#/components/schemas/comment'
+            $ref: "#/components/schemas/comment"
       required:
         - id
         - title
@@ -58,20 +51,20 @@ components:
           format: int64
           example: 1
         poster_user_key:
-            type: string
-            example: SlackのユーザーID
+          type: string
+          example: SlackのユーザーID
         content:
           type: string
           example: コメントの内容
         slack_parent_ts:
-            type: string
-            example: Slackの親投稿のタイムスタンプ
-        created_at:
+          type: string
+          example: Slackの親投稿のタイムスタンプ
+        slack_posted_at:
           type: string
           format: date-time
-          example: 2021-01-01T00:00:00.000Z
+          example: 2024-09-05T08:17:17.195549Z
       required:
         - memo_id
         - content
-        - created_at
+        - slack_posted_at
       additionalProperties: false
