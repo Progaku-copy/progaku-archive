@@ -113,11 +113,16 @@ class Memo < ApplicationRecord
 
     module OrderFilter
       DEFAULT_ORDER = 'desc'
-      private_constant :DEFAULT_ORDER
+      VALID_DIRECTIONS = %w[asc desc].freeze
+      SLACK_TS_ORDER_SQL = 'CAST(memos.slack_ts AS DECIMAL(20,6))'
+      private_constant :DEFAULT_ORDER, :VALID_DIRECTIONS, :SLACK_TS_ORDER_SQL
 
       # params[:order] に値が存在する場合、指定された順序でメモを返す
       def self.resolve(scope:, params:)
-        scope.order(id: params[:order].presence || DEFAULT_ORDER)
+        direction = params[:order].to_s.downcase
+        direction = DEFAULT_ORDER unless VALID_DIRECTIONS.include?(direction)
+
+        scope.order(Arel.sql("#{SLACK_TS_ORDER_SQL} #{direction.upcase}"))
       end
     end
     private_constant :OrderFilter
