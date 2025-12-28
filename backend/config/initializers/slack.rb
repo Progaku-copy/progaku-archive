@@ -23,7 +23,8 @@ Rails.application.config.slack = {
     {
       channel_id: 'C036V4FQ8EN',
       channel_name: 'おすすめのサイトや書籍など',
-      tag_id: 5
+      tag_id: 5,
+      force_import: true
     },
     {
       channel_id: 'C036VGHJQNQ',
@@ -73,7 +74,8 @@ Rails.application.config.slack = {
     {
       channel_id: 'C03BPRB3UDP',
       channel_name: '就職関連の共有や相談',
-      tag_id: 15
+      tag_id: 15,
+      force_import: true
     },
     {
       channel_id: 'C03FKU3CAG2',
