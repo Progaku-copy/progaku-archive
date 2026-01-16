@@ -116,6 +116,77 @@ RSpec.describe 'MemosController' do
         expect(response).to have_http_status(:unauthorized)
       end
     end
+
+    # rubocop:disable RSpec/LetSetup
+    shared_context 'メモデータ' do
+      let!(:first_memo) { create(:memo, title: 'メモタイトル１', content: 'メモコンテンツ１') }
+      let!(:second_memo) { create(:memo, title: 'メモタイトル２', content: 'メモコンテンツ２') }
+      let!(:third_memo) { create(:memo, title: 'その他タイトル', content: 'その他のコンテンツ') }
+    end
+    # rubocop:enable RSpec/LetSetup
+
+    context 'ログイン中かつ、タイトルが指定された場合' do
+      include_context 'メモデータ'
+
+      before { sign_in(user) }
+
+      it 'タイトルで部分一致するメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { title: 'メモ' }, headers: { 'Accept' => 'application/json' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          expect(response.parsed_body['memos'].length).to eq(2)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to contain_exactly(first_memo.id, second_memo.id)
+        end
+      end
+    end
+
+    context 'ログイン中かつ、コンテンツが指定された場合' do
+      include_context 'メモデータ'
+      before { sign_in(user) }
+
+      it 'コンテンツで部分一致するメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { content: 'メモ' }, headers: { 'Accept' => 'application/json' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          expect(response.parsed_body['memos'].length).to eq(2)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to contain_exactly(first_memo.id, second_memo.id)
+        end
+      end
+    end
+
+    context 'ログイン中かつ、並び順にascが指定された場合' do
+      include_context 'メモデータ'
+      before { sign_in(user) }
+
+      it '昇順でメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { order: 'asc', title: 'タイトル' }, headers: { 'Accept' => 'application/json' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to eq([first_memo.id, second_memo.id, third_memo.id])
+        end
+      end
+    end
+
+    context 'ログイン中かつ、並び順にdescが指定された場合' do
+      include_context 'メモデータ'
+      before { sign_in(user) }
+
+      it '降順でメモが返る' do
+        aggregate_failures do
+          get '/memos', params: { order: 'desc', title: 'タイトル' }, headers: { 'Accept' => 'application/json' }
+          assert_request_schema_confirm
+          assert_response_schema_confirm(200)
+          result_memo_ids = response.parsed_body['memos'].pluck('id')
+          expect(result_memo_ids).to eq([third_memo.id, second_memo.id, first_memo.id])
+        end
+      end
+    end
   end
 
   describe 'GET /memos/:id' do
